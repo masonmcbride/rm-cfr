@@ -1,0 +1,559 @@
+{
+  "decision_problem_pl1": [
+    {
+      "id": "o1_pl1",
+      "type": "observation",
+      "signals": [
+        "C:J?",
+        "C:Q?",
+        "C:K?"
+      ],
+      "parent_edge": null
+    },
+    {
+      "id": "/C:J?",
+      "type": "decision",
+      "actions": [
+        "P1:c",
+        "P1:r"
+      ],
+      "parent_edge": [
+        "o1_pl1",
+        "C:J?"
+      ],
+      "parent_sequence": null
+    },
+    {
+      "id": "o2_pl1",
+      "type": "observation",
+      "signals": [
+        "P2:r"
+      ],
+      "parent_edge": [
+        "/C:J?",
+        "P1:c"
+      ]
+    },
+    {
+      "id": "/C:J?/P1:c/P2:r",
+      "type": "decision",
+      "actions": [
+        "P1:c",
+        "P1:f"
+      ],
+      "parent_edge": [
+        "o2_pl1",
+        "P2:r"
+      ],
+      "parent_sequence": [
+        "/C:J?",
+        "P1:c"
+      ]
+    },
+    {
+      "id": "/C:Q?",
+      "type": "decision",
+      "actions": [
+        "P1:c",
+        "P1:r"
+      ],
+      "parent_edge": [
+        "o1_pl1",
+        "C:Q?"
+      ],
+      "parent_sequence": null
+    },
+    {
+      "id": "o3_pl1",
+      "type": "observation",
+      "signals": [
+        "P2:r"
+      ],
+      "parent_edge": [
+        "/C:Q?",
+        "P1:c"
+      ]
+    },
+    {
+      "id": "/C:Q?/P1:c/P2:r",
+      "type": "decision",
+      "actions": [
+        "P1:c",
+        "P1:f"
+      ],
+      "parent_edge": [
+        "o3_pl1",
+        "P2:r"
+      ],
+      "parent_sequence": [
+        "/C:Q?",
+        "P1:c"
+      ]
+    },
+    {
+      "id": "/C:K?",
+      "type": "decision",
+      "actions": [
+        "P1:c",
+        "P1:r"
+      ],
+      "parent_edge": [
+        "o1_pl1",
+        "C:K?"
+      ],
+      "parent_sequence": null
+    },
+    {
+      "id": "o4_pl1",
+      "type": "observation",
+      "signals": [
+        "P2:r"
+      ],
+      "parent_edge": [
+        "/C:K?",
+        "P1:c"
+      ]
+    },
+    {
+      "id": "/C:K?/P1:c/P2:r",
+      "type": "decision",
+      "actions": [
+        "P1:c",
+        "P1:f"
+      ],
+      "parent_edge": [
+        "o4_pl1",
+        "P2:r"
+      ],
+      "parent_sequence": [
+        "/C:K?",
+        "P1:c"
+      ]
+    }
+  ],
+  "decision_problem_pl2": [
+    {
+      "id": "o1_pl2",
+      "type": "observation",
+      "signals": [
+        "C:?J/P1:c",
+        "C:?J/P1:r",
+        "C:?Q/P1:c",
+        "C:?Q/P1:r",
+        "C:?K/P1:c",
+        "C:?K/P1:r"
+      ],
+      "parent_edge": null
+    },
+    {
+      "id": "/C:?J/P1:c",
+      "type": "decision",
+      "actions": [
+        "P2:c",
+        "P2:r"
+      ],
+      "parent_edge": [
+        "o1_pl2",
+        "C:?J/P1:c"
+      ],
+      "parent_sequence": null
+    },
+    {
+      "id": "/C:?J/P1:r",
+      "type": "decision",
+      "actions": [
+        "P2:c",
+        "P2:f"
+      ],
+      "parent_edge": [
+        "o1_pl2",
+        "C:?J/P1:r"
+      ],
+      "parent_sequence": null
+    },
+    {
+      "id": "/C:?Q/P1:c",
+      "type": "decision",
+      "actions": [
+        "P2:c",
+        "P2:r"
+      ],
+      "parent_edge": [
+        "o1_pl2",
+        "C:?Q/P1:c"
+      ],
+      "parent_sequence": null
+    },
+    {
+      "id": "/C:?Q/P1:r",
+      "type": "decision",
+      "actions": [
+        "P2:c",
+        "P2:f"
+      ],
+      "parent_edge": [
+        "o1_pl2",
+        "C:?Q/P1:r"
+      ],
+      "parent_sequence": null
+    },
+    {
+      "id": "/C:?K/P1:c",
+      "type": "decision",
+      "actions": [
+        "P2:c",
+        "P2:r"
+      ],
+      "parent_edge": [
+        "o1_pl2",
+        "C:?K/P1:c"
+      ],
+      "parent_sequence": null
+    },
+    {
+      "id": "/C:?K/P1:r",
+      "type": "decision",
+      "actions": [
+        "P2:c",
+        "P2:f"
+      ],
+      "parent_edge": [
+        "o1_pl2",
+        "C:?K/P1:r"
+      ],
+      "parent_sequence": null
+    }
+  ],
+  "utility_pl1": [
+    {
+      "sequence_pl1": [
+        "/C:J?",
+        "P1:c"
+      ],
+      "sequence_pl2": [
+        "/C:?Q/P1:c",
+        "P2:c"
+      ],
+      "value": -0.16666666666666666
+    },
+    {
+      "sequence_pl1": [
+        "/C:J?/P1:c/P2:r",
+        "P1:c"
+      ],
+      "sequence_pl2": [
+        "/C:?Q/P1:c",
+        "P2:r"
+      ],
+      "value": -0.3333333333333333
+    },
+    {
+      "sequence_pl1": [
+        "/C:J?/P1:c/P2:r",
+        "P1:f"
+      ],
+      "sequence_pl2": [
+        "/C:?Q/P1:c",
+        "P2:r"
+      ],
+      "value": -0.16666666666666666
+    },
+    {
+      "sequence_pl1": [
+        "/C:J?",
+        "P1:r"
+      ],
+      "sequence_pl2": [
+        "/C:?Q/P1:r",
+        "P2:c"
+      ],
+      "value": -0.3333333333333333
+    },
+    {
+      "sequence_pl1": [
+        "/C:J?",
+        "P1:r"
+      ],
+      "sequence_pl2": [
+        "/C:?Q/P1:r",
+        "P2:f"
+      ],
+      "value": 0.16666666666666666
+    },
+    {
+      "sequence_pl1": [
+        "/C:J?",
+        "P1:c"
+      ],
+      "sequence_pl2": [
+        "/C:?K/P1:c",
+        "P2:c"
+      ],
+      "value": -0.16666666666666666
+    },
+    {
+      "sequence_pl1": [
+        "/C:J?/P1:c/P2:r",
+        "P1:c"
+      ],
+      "sequence_pl2": [
+        "/C:?K/P1:c",
+        "P2:r"
+      ],
+      "value": -0.3333333333333333
+    },
+    {
+      "sequence_pl1": [
+        "/C:J?/P1:c/P2:r",
+        "P1:f"
+      ],
+      "sequence_pl2": [
+        "/C:?K/P1:c",
+        "P2:r"
+      ],
+      "value": -0.16666666666666666
+    },
+    {
+      "sequence_pl1": [
+        "/C:J?",
+        "P1:r"
+      ],
+      "sequence_pl2": [
+        "/C:?K/P1:r",
+        "P2:c"
+      ],
+      "value": -0.3333333333333333
+    },
+    {
+      "sequence_pl1": [
+        "/C:J?",
+        "P1:r"
+      ],
+      "sequence_pl2": [
+        "/C:?K/P1:r",
+        "P2:f"
+      ],
+      "value": 0.16666666666666666
+    },
+    {
+      "sequence_pl1": [
+        "/C:Q?",
+        "P1:c"
+      ],
+      "sequence_pl2": [
+        "/C:?J/P1:c",
+        "P2:c"
+      ],
+      "value": 0.16666666666666666
+    },
+    {
+      "sequence_pl1": [
+        "/C:Q?/P1:c/P2:r",
+        "P1:c"
+      ],
+      "sequence_pl2": [
+        "/C:?J/P1:c",
+        "P2:r"
+      ],
+      "value": 0.3333333333333333
+    },
+    {
+      "sequence_pl1": [
+        "/C:Q?/P1:c/P2:r",
+        "P1:f"
+      ],
+      "sequence_pl2": [
+        "/C:?J/P1:c",
+        "P2:r"
+      ],
+      "value": -0.16666666666666666
+    },
+    {
+      "sequence_pl1": [
+        "/C:Q?",
+        "P1:r"
+      ],
+      "sequence_pl2": [
+        "/C:?J/P1:r",
+        "P2:c"
+      ],
+      "value": 0.3333333333333333
+    },
+    {
+      "sequence_pl1": [
+        "/C:Q?",
+        "P1:r"
+      ],
+      "sequence_pl2": [
+        "/C:?J/P1:r",
+        "P2:f"
+      ],
+      "value": 0.16666666666666666
+    },
+    {
+      "sequence_pl1": [
+        "/C:Q?",
+        "P1:c"
+      ],
+      "sequence_pl2": [
+        "/C:?K/P1:c",
+        "P2:c"
+      ],
+      "value": -0.16666666666666666
+    },
+    {
+      "sequence_pl1": [
+        "/C:Q?/P1:c/P2:r",
+        "P1:c"
+      ],
+      "sequence_pl2": [
+        "/C:?K/P1:c",
+        "P2:r"
+      ],
+      "value": -0.3333333333333333
+    },
+    {
+      "sequence_pl1": [
+        "/C:Q?/P1:c/P2:r",
+        "P1:f"
+      ],
+      "sequence_pl2": [
+        "/C:?K/P1:c",
+        "P2:r"
+      ],
+      "value": -0.16666666666666666
+    },
+    {
+      "sequence_pl1": [
+        "/C:Q?",
+        "P1:r"
+      ],
+      "sequence_pl2": [
+        "/C:?K/P1:r",
+        "P2:c"
+      ],
+      "value": -0.3333333333333333
+    },
+    {
+      "sequence_pl1": [
+        "/C:Q?",
+        "P1:r"
+      ],
+      "sequence_pl2": [
+        "/C:?K/P1:r",
+        "P2:f"
+      ],
+      "value": 0.16666666666666666
+    },
+    {
+      "sequence_pl1": [
+        "/C:K?",
+        "P1:c"
+      ],
+      "sequence_pl2": [
+        "/C:?J/P1:c",
+        "P2:c"
+      ],
+      "value": 0.16666666666666666
+    },
+    {
+      "sequence_pl1": [
+        "/C:K?/P1:c/P2:r",
+        "P1:c"
+      ],
+      "sequence_pl2": [
+        "/C:?J/P1:c",
+        "P2:r"
+      ],
+      "value": 0.3333333333333333
+    },
+    {
+      "sequence_pl1": [
+        "/C:K?/P1:c/P2:r",
+        "P1:f"
+      ],
+      "sequence_pl2": [
+        "/C:?J/P1:c",
+        "P2:r"
+      ],
+      "value": -0.16666666666666666
+    },
+    {
+      "sequence_pl1": [
+        "/C:K?",
+        "P1:r"
+      ],
+      "sequence_pl2": [
+        "/C:?J/P1:r",
+        "P2:c"
+      ],
+      "value": 0.3333333333333333
+    },
+    {
+      "sequence_pl1": [
+        "/C:K?",
+        "P1:r"
+      ],
+      "sequence_pl2": [
+        "/C:?J/P1:r",
+        "P2:f"
+      ],
+      "value": 0.16666666666666666
+    },
+    {
+      "sequence_pl1": [
+        "/C:K?",
+        "P1:c"
+      ],
+      "sequence_pl2": [
+        "/C:?Q/P1:c",
+        "P2:c"
+      ],
+      "value": 0.16666666666666666
+    },
+    {
+      "sequence_pl1": [
+        "/C:K?/P1:c/P2:r",
+        "P1:c"
+      ],
+      "sequence_pl2": [
+        "/C:?Q/P1:c",
+        "P2:r"
+      ],
+      "value": 0.3333333333333333
+    },
+    {
+      "sequence_pl1": [
+        "/C:K?/P1:c/P2:r",
+        "P1:f"
+      ],
+      "sequence_pl2": [
+        "/C:?Q/P1:c",
+        "P2:r"
+      ],
+      "value": -0.16666666666666666
+    },
+    {
+      "sequence_pl1": [
+        "/C:K?",
+        "P1:r"
+      ],
+      "sequence_pl2": [
+        "/C:?Q/P1:r",
+        "P2:c"
+      ],
+      "value": 0.3333333333333333
+    },
+    {
+      "sequence_pl1": [
+        "/C:K?",
+        "P1:r"
+      ],
+      "sequence_pl2": [
+        "/C:?Q/P1:r",
+        "P2:f"
+      ],
+      "value": 0.16666666666666666
+    }
+  ]
+}

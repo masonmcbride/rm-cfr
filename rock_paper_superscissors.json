@@ -1,0 +1,16 @@
+{
+  "decision_problem_pl1": [
+    {"id": "d1_pl1", "type": "decision", "actions": ["r", "p", "s"], "parent_edge": null, "parent_sequence": null}
+  ],
+  "decision_problem_pl2": [
+    {"id": "d1_pl2", "type": "decision", "actions": ["r", "p", "s"], "parent_edge": null, "parent_sequence": null}
+  ],
+  "utility_pl1": [
+    {"sequence_pl1": ["d1_pl1", "r"], "sequence_pl2": ["d1_pl2", "p"], "value": -1},
+    {"sequence_pl1": ["d1_pl1", "r"], "sequence_pl2": ["d1_pl2", "s"], "value": 1},
+    {"sequence_pl1": ["d1_pl1", "p"], "sequence_pl2": ["d1_pl2", "r"], "value": 1},
+    {"sequence_pl1": ["d1_pl1", "p"], "sequence_pl2": ["d1_pl2", "s"], "value": -2},
+    {"sequence_pl1": ["d1_pl1", "s"], "sequence_pl2": ["d1_pl2", "r"], "value": -1},
+    {"sequence_pl1": ["d1_pl1", "s"], "sequence_pl2": ["d1_pl2", "p"], "value": 2}
+  ]
+}
