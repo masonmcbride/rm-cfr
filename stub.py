@@ -4,7 +4,7 @@ import os
 import argparse
 import json
 from pprint import pprint
-from sre_constants import GROUPREF_EXISTS
+from fractions import Fraction
 
 ###############################################################################
 # The next functions are already implemented for your convenience
@@ -85,7 +85,7 @@ def compute_utility_vector_pl1(game, sf_strategy_pl2):
     assert_is_valid_sf_strategy(game["decision_problem_pl2"], sf_strategy_pl2)
 
     sequence_set = get_sequence_set(game["decision_problem_pl1"])
-    utility = {sequence: 0.0 for sequence in sequence_set}
+    utility = {sequence: Fraction(0) for sequence in sequence_set}
     for entry in game["utility_pl1"]:
         utility[entry["sequence_pl1"]] += entry["value"] * sf_strategy_pl2[entry["sequence_pl2"]]
 
@@ -137,7 +137,7 @@ def succ(tfsdp, v, a):
             return node["id"]
     return None
 
-def expected_utility_pl1(game, sf_strategy_pl1, sf_strategy_pl2) -> val:
+def expected_utility_pl1(game, sf_strategy_pl1, sf_strategy_pl2) -> Fraction:
     """Returns the expected utility for Player 1 in the game, when the two
     players play according to the given strategies"""
 
@@ -155,13 +155,15 @@ def uniform_sf_strategy(tfsdp):
 
     # FINISH
     uniform_strategy: Map[Sequence, prob] = {}
-    for node in tfsdp:
-        if node["type"] == "decision":
-            parent_reach = 1.0
-            if node["parent_sequence"] is not None:
-                parent_reach = uniform_strategy[node["parent_sequence"]]
-            for action in node["actions"]:
-                uniform_strategy[(node["id"], action)] = parent_reach/len(node["actions"])
+    J = [node for node in tfsdp if node["type"] == "decision"]
+    for j in J:
+        match j["parent_sequence"]:
+            case None: parent_reach = 1
+            case    _: parent_reach = uniform_sf_strategy[j["parent_sequence"]]
+        for action in j["actions"]:
+            n = len(j["actions"])
+            print(f"Fraction({parent_reach}, {n})")
+            uniform_strategy[(j["id"], action)] = Fraction(parent_reach, len(j["actions"]))
 
     assert_is_valid_sf_strategy(tfsdp, uniform_strategy)
     return uniform_strategy
@@ -170,15 +172,15 @@ def uniform_sf_strategy(tfsdp):
 class RegretMatching(object):
     def __init__(self, action_set):
         self.action_set = set(action_set)
-        self.regret_sum: Map[Action, cumulate] = {action: 0 for action in self.action_set}
+        self.regret_sum: Map[Action, cumulate] = {action: Fraction(0) for action in self.action_set}
 
     def next_strategy(self) -> Map[Action, prob]:
         r_plus: Map[Action, Regret] = {action: max(regret, 0) for action, regret in self.regret_sum.items()}
         if not any(r_plus.values()):
-            return {action: 1./len(self.action_set) for action in self.action_set}
+            return {action: Fraction(1, len(self.action_set)) for action in self.action_set}
         else:
             normalizer = sum(r_plus.values())
-            return {action: regret/normalizer for action, regret in r_plus.items()}
+            return {action: Fraction(regret, normalizer) for action, regret in r_plus.items()}
 
     def observe_utility(self, utility: Utility):
         assert isinstance(utility, dict) and utility.keys() == self.action_set
@@ -259,23 +261,28 @@ class Cfr(object):
 
 
 def solve_problem_3_1(game):
+    # Constants
     tfsdp1, tfsdp2 = game["decision_problem_pl1"], game["decision_problem_pl2"]
-    T = 10_000
+    T = 1_000
     
-    p1_cfr = Cfr(tfsdp=tfsdp1)
-
+    #initialize
+    p1_rm = RegretMatching(get_sequence_set(tfsdp1))
     y = uniform_sf_strategy(tfsdp2)
-    utility = compute_utility_vector_pl1(game, y)
+    utility_1 = compute_utility_vector_pl1(game, y)
 
-    strategy_sum = {sequence: 0 for sequence in get_sequence_set(tfsdp1)}
+    # start the loop
+    strategy_sum = {sequence: Fraction(0) for sequence in get_sequence_set(tfsdp1)}
     for _ in range(T):
-        x = p1_cfr.next_strategy()
-        p1_cfr.observe_utility(utility)
+        x = p1_rm.next_strategy()
+        p1_rm.observe_utility(utility_1)
 
         for sequence in get_sequence_set(tfsdp1):
             strategy_sum[sequence] += x[sequence]
-    average_strategy = {sequence: strategy/T for sequence, strategy in strategy_sum.items()}
-    print(f"ev x_starAy={expected_utility_pl1(game, average_strategy, y)}, br value={best_response_value(tfsdp1, utility)}")
+
+
+    average_strategy = {sequence: Fraction(strategy, T) for sequence, strategy in strategy_sum.items()}
+    pprint(average_strategy)
+    print(f"ev xAy={expected_utility_pl1(game, average_strategy, y)}")
 
 
 def solve_problem_3_2(game):
