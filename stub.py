@@ -3,8 +3,7 @@
 import os
 import argparse
 import json
-from pprint import pprint
-from fractions import Fraction
+import matplotlib.pyplot as plt
 
 ###############################################################################
 # The next functions are already implemented for your convenience
@@ -15,34 +14,24 @@ from fractions import Fraction
 #
 # See the homework handout for a description of each field.
 
-from typing import Mapping
+History = str
+Action = str
+Sequence = tuple[History, Action]
+Prob = float
+Node = str
 
-Map = Mapping
-Action, Sequence, RM_ID, Node = str, str, str, str
-Regret, prob, val, cumulate = float, float, float, float
-Strategy = Map[Sequence, prob]
-Utility = Map[Sequence, val]
-
-
-def get_sequence_set(tfsdp):
+def get_sequence_set(tfsdp: dict) -> set[Sequence]:
     """Returns a set of all sequences in the given tree-form sequential decision
     process (TFSDP)"""
-
-    sequences = set()
-    for node in tfsdp:
-        if node["type"] == "decision":
-            for action in node["actions"]:
-                sequences.add((node["id"], action))
+    sequences = {(node['id'],action) for node in tfsdp if node['type'] == 'decision' for action in node['actions']}
     return sequences
 
-
-def is_valid_RSigma_vector(tfsdp, obj):
+def is_valid_RSigma_vector(tfsdp: dict, obj):
     """Checks that the given object is a dictionary keyed on the set of sequences
     of the given tree-form sequential decision process (TFSDP)"""
 
     sequence_set = get_sequence_set(tfsdp)
     return isinstance(obj, dict) and obj.keys() == sequence_set
-
 
 def assert_is_valid_sf_strategy(tfsdp, obj):
     """Checks whether the given object `obj` represents a valid sequence-form
@@ -65,7 +54,6 @@ def best_response_value(tfsdp, utility):
     """Computes the value of max_{x in Q} x^T utility, where Q is the
     sequence-form polytope for the given tree-form sequential decision
     process (TFSDP)"""
-    # utility: Mapping[Sequence, utility]
 
     assert is_valid_RSigma_vector(tfsdp, utility)
 
@@ -79,22 +67,21 @@ def best_response_value(tfsdp, utility):
     return utility_[None]
 
 def compute_utility_vector_pl1(game, sf_strategy_pl2):
-    """Returns A * y, where A is the payoff matrix of the game and y is
+    """Returns Ay, where A is the payoff matrix of the game and y is
     the given strategy for Player 2"""
 
-    assert_is_valid_sf_strategy(game["decision_problem_pl2"], sf_strategy_pl2)
+    assert_is_valid_sf_strategy(game['decision_problem_pl2'], sf_strategy_pl2)
 
-    sequence_set = get_sequence_set(game["decision_problem_pl1"])
-    utility = {sequence: Fraction(0) for sequence in sequence_set}
+    sequence_set = get_sequence_set(game['decision_problem_pl1'])
+    utility = {sequence: 0 for sequence in sequence_set}
     for entry in game["utility_pl1"]:
         utility[entry["sequence_pl1"]] += entry["value"] * sf_strategy_pl2[entry["sequence_pl2"]]
 
     assert is_valid_RSigma_vector(game["decision_problem_pl1"], utility)
     return utility
 
-
 def compute_utility_vector_pl2(game, sf_strategy_pl1):
-    """Returns -A^transpose * x, where A is the payoff matrix of the
+    """Returns -A^Tx, where A is the payoff matrix of the
     game and x is the given strategy for Player 1"""
 
     assert_is_valid_sf_strategy(
@@ -107,7 +94,6 @@ def compute_utility_vector_pl2(game, sf_strategy_pl1):
 
     assert is_valid_RSigma_vector(game["decision_problem_pl2"], utility)
     return utility
-
 
 def gap(game, sf_strategy_pl1, sf_strategy_pl2):
     """Computes the saddle point gap of the given sequence-form strategies
@@ -127,43 +113,36 @@ def gap(game, sf_strategy_pl1, sf_strategy_pl2):
 # Starting from here, you should fill in the implementation of the
 # different functions
 
-def succ(tfsdp, v, a):
-    # O(N)
-    # solution: precompute the mapping that precomputes the parent_edge to the node["id"]
-    # parent_edge is needed but parent_sequence can be computed when you need
-    # most algorithms need the parent_sequence
+def succ(tfsdp, history: str, action: str):
+    """Return node id that is the successor of the (history,action) tuple"""
     for node in tfsdp:
-        if node["parent_edge"] == (v, a):
+        if node["parent_edge"] == (history, action):
             return node["id"]
     return None
 
-def expected_utility_pl1(game, sf_strategy_pl1, sf_strategy_pl2) -> Fraction:
+def expected_utility_pl1(game, sf_strategy_pl1: dict[Sequence, Prob], sf_strategy_pl2: dict[Sequence, Prob]):
     """Returns the expected utility for Player 1 in the game, when the two
     players play according to the given strategies"""
 
     assert_is_valid_sf_strategy(game["decision_problem_pl1"], sf_strategy_pl1)
     assert_is_valid_sf_strategy(game["decision_problem_pl2"], sf_strategy_pl2)
 
-    Ay: Map[Sequence, val] = compute_utility_vector_pl1(game, sf_strategy_pl2)
-    xAy: val = sum([sf_strategy_pl1[sequence]*Ay[sequence] for sequence in sf_strategy_pl1])
+    Ay: dict[Sequence, float] = compute_utility_vector_pl1(game, sf_strategy_pl2)
+    xAy = sum([sf_strategy_pl1[sequence]*Ay[sequence] for sequence in sf_strategy_pl1])
     return xAy
 
-
-def uniform_sf_strategy(tfsdp):
+def uniform_sf_strategy(tfsdp) -> dict[tuple[str,str], float]:
     """Returns the uniform sequence-form strategy for the given tree-form
     sequential decision process"""
 
-    # FINISH
-    uniform_strategy: Map[Sequence, prob] = {}
+    uniform_strategy: dict[tuple[str,str], float] = {}
     J = [node for node in tfsdp if node["type"] == "decision"]
     for j in J:
         match j["parent_sequence"]:
             case None: parent_reach = 1
-            case    _: parent_reach = uniform_sf_strategy[j["parent_sequence"]]
+            case parent_sequence: parent_reach = uniform_strategy[parent_sequence]
         for action in j["actions"]:
-            n = len(j["actions"])
-            print(f"Fraction({parent_reach}, {n})")
-            uniform_strategy[(j["id"], action)] = Fraction(parent_reach, len(j["actions"]))
+            uniform_strategy[(j["id"], action)] = parent_reach/len(j["actions"])
 
     assert_is_valid_sf_strategy(tfsdp, uniform_strategy)
     return uniform_strategy
@@ -172,21 +151,21 @@ def uniform_sf_strategy(tfsdp):
 class RegretMatching(object):
     def __init__(self, action_set):
         self.action_set = set(action_set)
-        self.regret_sum: Map[Action, cumulate] = {action: Fraction(0) for action in self.action_set}
+        self.regret_sum: dict[Action, float] = {action: 0 for action in self.action_set}
 
-    def next_strategy(self) -> Map[Action, prob]:
-        r_plus: Map[Action, Regret] = {action: max(regret, 0) for action, regret in self.regret_sum.items()}
+    def next_strategy(self) -> dict[str,float]:
+        r_plus: dict[str,float] = {action: max(regret, 0) for action, regret in self.regret_sum.items()}
         if not any(r_plus.values()):
-            return {action: Fraction(1, len(self.action_set)) for action in self.action_set}
+            return {action: 1./len(self.action_set) for action in self.action_set}
         else:
             normalizer = sum(r_plus.values())
-            return {action: Fraction(regret, normalizer) for action, regret in r_plus.items()}
+            return {action: regret/normalizer for action, regret in r_plus.items()}
 
-    def observe_utility(self, utility: Utility):
+    def observe_utility(self, utility: dict[str,float]):
         assert isinstance(utility, dict) and utility.keys() == self.action_set
 
-        x: Map[Action, prob] = self.next_strategy()
-        ground_truth: val = sum(x[action] * utility[action] for action in self.action_set)
+        x: dict[str,float] = self.next_strategy()
+        ground_truth: float = sum(x[action] * utility[action] for action in self.action_set)
 
         for action in self.action_set:
             self.regret_sum[action] += utility[action] - ground_truth
@@ -216,46 +195,53 @@ class RegretMatchingPlus(object):
 class Cfr(object):
     def __init__(self, tfsdp, rm_class=RegretMatching):
 
-        __slots__ = ('tfsdp', 'J', 'local_regret_minimizers', 'strategy_sum')
+        __slots__ = ('tfsdp', 'J', 'local_regret_minimizers')
         
+        # tree form sequential decision problem 
         self.tfsdp = tfsdp
+
+        # decision nodes 
         self.J = [node for node in tfsdp if node["type"] == "decision"]
         
-        self.local_regret_minimizers: Map[RM_ID, rm_class] = {j["id"]: rm_class(j["actions"]) for j in self.J}
-        self.strategy_sum: Map[Sequence, cumulate] = {(j["id"], action): 0 for j in self.J for action in j["actions"]}
+        # regeret minimizers assigned to each decision node
+        self.local_regret_minimizers: dict[str, RegretMatching] = {j["id"]: rm_class(j["actions"]) for j in self.J}
 
-    def next_strategy(self) -> Map[Sequence, prob]:
+    def next_strategy(self) -> dict[Sequence, Prob]:
+        """Based on the current regret minmizers, return the strategy for each (history,action) pair """
         
+        # get the local strategy at each regret minimizer 
         local_strats = {rm_id: rm.next_strategy() for rm_id, rm in self.local_regret_minimizers.items()}
 
-        strategy: Map[Sequence, prob] = {}
+        # go through each decision node top-down and mulitply by the reach_prob
+        strategy = {}
         for j in self.J:
             match j["parent_sequence"]:
-                case None: reach_prob = 1.0
-                case _:    reach_prob = strategy[j["parent_sequence"]]
+                case None: reach_prob = 1.
+                case parent_sequence: reach_prob = strategy[parent_sequence]
             for a in j["actions"]:
                 strategy[(j["id"], a)] = reach_prob * local_strats[j["id"]][a]
         return strategy
 
-    def observe_utility(self, utility: Utility):
-        p = lambda v, a: succ(self.tfsdp, v, a)
+    def observe_utility(self, utility):
+        s = lambda v, a: succ(self.tfsdp, v, a)
         local_strats = {rm_id: rm.next_strategy() for rm_id, rm in self.local_regret_minimizers.items()}
         
-        EV: Map[Node, val] = {None: 0}
+        # go through each node bottom-up and build up expected value for each node 
+        EV: dict[Node, float] = {None: 0}
         for j in reversed(self.tfsdp):
             EV[j["id"]] = 0
             match j["type"]:
                 case "decision": 
                     local_strat = local_strats[j["id"]]
                     for action in j["actions"]:
-                        EV[j["id"]] += local_strat[action] * (utility[(j["id"], action)] + EV[p(j["id"], action)])
+                        EV[j["id"]] += local_strat[action] * (utility[(j["id"], action)] + EV[s(j["id"], action)])
                 case "observation":
                     for signal in j["signals"]:
-                        EV[j["id"]] += EV[p(j["id"], signal)]
+                        EV[j["id"]] += EV[s(j["id"], signal)]
         # we have computed the average of the counterfactual values
 
         for j in self.J:
-                local_utility: Map[Action, val] = {action: (utility[(j["id"], action)] + EV[p(j["id"], action)]) 
+                local_utility: dict[Action, float] = {action: utility[(j["id"], action)] + EV[s(j["id"], action)]
                     for action in j["actions"]}
                 self.local_regret_minimizers[j["id"]].observe_utility(local_utility)
 
@@ -265,25 +251,37 @@ def solve_problem_3_1(game):
     tfsdp1, tfsdp2 = game["decision_problem_pl1"], game["decision_problem_pl2"]
     T = 1_000
     
-    #initialize
-    p1_rm = RegretMatching(get_sequence_set(tfsdp1))
+    # initialize
+    p1_cfr = Cfr(tfsdp1)
     y = uniform_sf_strategy(tfsdp2)
-    utility_1 = compute_utility_vector_pl1(game, y)
 
     # start the loop
-    strategy_sum = {sequence: Fraction(0) for sequence in get_sequence_set(tfsdp1)}
-    for _ in range(T):
-        x = p1_rm.next_strategy()
-        p1_rm.observe_utility(utility_1)
+    strategy_sum = {sequence: 0 for sequence in get_sequence_set(tfsdp1)}
+    values = []
+    for t in range(1,T+1):
+        if t % 100 == 0: 
+            print(f"doing time {t}") 
+        x = p1_cfr.next_strategy()
+
+        utility_1 = compute_utility_vector_pl1(game, y)
+
+        p1_cfr.observe_utility(utility_1)
 
         for sequence in get_sequence_set(tfsdp1):
             strategy_sum[sequence] += x[sequence]
 
+        average_strategy = {sequence: strategy/t for sequence, strategy in strategy_sum.items()}
+        xAy = expected_utility_pl1(game, average_strategy, y)
+        values.append(xAy)
 
-    average_strategy = {sequence: Fraction(strategy, T) for sequence, strategy in strategy_sum.items()}
-    pprint(average_strategy)
-    print(f"ev xAy={expected_utility_pl1(game, average_strategy, y)}")
+    fig = plt.figure()
+    fig.suptitle(f'CFR value for {args.game[:-5]} for time {T}', fontsize=10)
+    plt.plot(range(T), values, color='r',linewidth=0.5)
+    plt.xlabel('Time (t)', fontsize=10)
+    plt.ylabel('Value', fontsize=10)
 
+    plt.savefig(f'prob3.1_{args.game[:-5]}.png')
+    plt.show()
 
 def solve_problem_3_2(game):
     # FINISH
