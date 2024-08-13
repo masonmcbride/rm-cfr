@@ -31,6 +31,7 @@ class RegretMatching(object):
         ground_truth: float = sum(x[action] * utility[action] for action in self.action_set)
 
         self.regret_sum = {action: current_sum + utility[action] - ground_truth for action,current_sum in self.regret_sum.items()}
+        
 class RegretMatchingPlus(object):
     def __init__(self, action_set):
         self.action_set = set(action_set)
