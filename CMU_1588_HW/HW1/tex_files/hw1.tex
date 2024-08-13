@@ -1,0 +1,490 @@
+\documentclass{homework}
+\usepackage{gabri_notation}
+\usepackage{tikz-qtree}
+
+\course{15-888 Computational Game Solving (Fall 2021)}
+\homework{1}
+\releasedate{Sept. 23, 2021}
+\duedate{Oct. 7, 2021, beginning of class}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\student{\todo{Your Andrew ID here}}
+
+\begin{document}
+
+\maketitle
+
+\paragraph{Instructions} Please typeset your solution in the tex file provided in the homework zip. Attach a readable printout of your CFR code at the end of the document. Turn in your printed solution at the beginning of class on October 5th. Don't forget to fill in your student ID above :-)
+
+\paragraph{Bonus points} This homework contains 3 problems (each split into smaller tasks), for a total of 120 points. The goal of the 20 bonus points is to help you in case you lost some points here and there. The maximum score for the homework will be capped at 100. In other words, your score will be set to the minimum between 100 and the sum of the points you scored on all questions, including the bonus questions.
+
+\section{A Regret-Based Proof of the Minmax Theorem (20 points)}
+
+Let $\cX \subseteq \bbR^n$ and $\cY \subseteq \bbR^m$ be convex and compact sets, and $\vec{A} \in \mathbb{R}^{n\times m}$. The minmax theorem asserts that
+\[
+    \max_{\vec{x}\in\cX}\min_{\vec{y}\in\cY} \vec{x}^\top\!\! \vec{A} \vec{y} = \min_{\vec{y}\in\cY}\max_{\vec{x}\in\cX} \vec{x}^\top\!\! \vec{A} \vec{y}.
+\]
+In this problem you will show that the fact that (external) regret minimization algorithms for
+$\cX$ exist is a powerful enough statement to imply the minmax theorem.
+
+One direction (called \emph{weak duality}) of the proof is easy and very general. Specifically, show the following.
+
+\begin{problem}[8 points]
+    Show that
+    \[
+        \max_{\vec{x}\in\cX}\min_{\vec{y}\in\cY} \vec{x}^\top\!\! \vec{A} \vec{y} \le \min_{\vec{y}\in\cY}\max_{\vec{x}\in\cX} \vec{x}^\top\!\! \vec{A} \vec{y}.
+        \numberthis{eq:weak duality}
+    \]
+    \hint{start by arguing that for any $\vec{y}^*\in\cY$, $\max_{\vec{x}\in\cX}\min_{\vec{y}\in\cY} \vec{x}^\top\!\! \vec{A} \vec{y} \le \max_{\vec{x}\in\cX} \vec{x}^\top\!\! \vec{A} \vec{y}^* $.}
+\end{problem}
+\begin{solution}
+    \todo{Your solution here}
+\end{solution}
+
+
+\noindent To show the reverse inequality, we will interpret the bilinear saddle point $\min_{\vec{y}\in\cY}\max_{\vec{x}\in\cX} \vec{x}^\top\!\! \vec{A} \vec{y}$ as a repeated game. At each time $t$, we will let a regret minimizer $\cR_\cX$ pick actions $\vec{x}^t \in\cX$, whereas we will always assume that $\vec{y}^t \in\cY$ is chosen by the environment to best respond to $\vec{x}^t$, that is,
+\[
+    \vec{y}^t \in \argmin_{\vec{y} \in \cY} (\vec{x}^t)^\top\!\! \vec{A} \vec{y}.
+\]
+The utility function observed by $\cR_\cX$ at each time $t$ is set to
+\begin{equation*}
+    \ell^t_\cX : \vec{x} \mapsto \vec{x}^\top\!\!\vec{A}\vec{y}^t = (\vec{A}\vec{y}^t)^\top \vec{x}.
+\end{equation*}
+By definition of regret minimizer, we will assume that $\cR_\cX$ guarantees \emph{sublinear regret} in the worst case.
+
+Let $\bar{\vec{x}}^T \in \cX$ and $\bar{\vec{y}}^T \in \cY$ be the average strategies output up to time $T$, that is,
+\[
+    \bar{\vec{x}}^T \defeq \frac{1}{T}\sum_{t=1}^T \vec{x}^t \qquad \bar{\vec{y}}^T \defeq \frac{1}{T}\sum_{t=1}^T \vec{y}^t.
+\] 
+
+\begin{problem}[5 points]
+    Argue that at all $t$,
+    \[
+        \max_{\vec{x}\in\cX}\min_{\vec{y}\in\cY} \vec{x}^\top\!\! \vec{A} \vec{y} \ge \frac{1}{T} \min_{\vec{y}\in\cY}\sum_{t=1}^T (\vec{x}^t)^\top\!\!\vec{A}\vec{y} \ge \frac{1}{T}\sum_{t=1}^T (\vec{x}^t)^\top\!\!\vec{A}\vec{y}^t.
+        \numberthis{eq:minmax bound}
+    \]
+    \hint{lower bound the maximum over $\vec{x}\in\cX$ by plugging the particular choice $\bar{\vec{x}}^T$. Then, use the information you have on $\vec{y}^t$.}
+\end{problem}
+\begin{solution}
+    \todo{Your solution here}
+\end{solution}
+
+
+\begin{problem}[5 points]
+    Let $R_\cX^T$ be the regret cumulated by $\cR_\cX$ up to time $T$. Using~\eqref{eq:minmax bound}, argue that at all times $T$
+    \[
+        \max_{\vec{x}\in\cX}\min_{\vec{y}\in\cY} \vec{x}^\top\!\! \vec{A} \vec{y} \ge \min_{\vec{y}\in\cY}\max_{\vec{x}\in\cX} \vec{x}^\top\!\! \vec{A} \vec{y} - \frac{R^T_\cX}{T}.
+        \numberthis{eq:minmax bound 2}
+    \]
+    \hint{use the definition of regret $R_\cX^T$.}
+\end{problem}
+\begin{solution}
+    \todo{Your solution here}
+\end{solution}
+
+
+\begin{problem}[2 points]
+    Use~\eqref{eq:minmax bound 2} and~\eqref{eq:weak duality} and to conclude that
+    \[
+        \max_{\vec{x}\in\cX}\min_{\vec{y}\in\cY} \vec{x}^\top\!\! \vec{A} \vec{y} = \min_{\vec{y}\in\cY}\max_{\vec{x}\in\cX} \vec{x}^\top\!\! \vec{A} \vec{y},
+    \]
+\end{problem}
+\begin{solution}
+    \todo{Your solution here}
+\end{solution}
+
+\section{Swap Regret Minimization on Simplex Domains (30 + 10 points)}
+
+In this problem you will use the construction of \citet{Gordon08:No} seen in Lecture 3
+to come up with a regret minimizer for swap regret for single-shot decision making.
+
+We will view swap regret minimization an instance of $\Phi$-regret minimization
+where the set of transformations $\Phi$ is taken to be the set of \emph{all} linear functions 
+that map $\Delta^n$ to $\Delta^n$.\footnote{In particular, it can be easily shown that $\Phi$ contains all functions that map deterministic strategies to deterministic strategies.}
+
+We start with a handy characterization of all functions from $\Delta^n$ to $\Delta^n$.
+
+\begin{problem}[7 points]
+    Argue that a linear function $f: \bbR^n \to \bbR^n$ maps $\Delta^n$ to $\Delta^n$ (that is, $f(\Delta^n) \subseteq \Delta^n$) if and only if it can be written in the form
+    \[
+        f(\vec{x}) = \vec{M} \vec{x},
+    \]
+    where $\vec{M}$ is a (column-)stochastic matrix, that is, a nonnegative matrix whose columns all sum to $1$.%
+    \hint{first of all, any linear function can be written in the form $f(\vec{x}) = \vec{A}\vec{x}$. Furthermore, if $f$ maps $\Delta^n$ to $\Delta^n$, then in particular the vertices $\{\vec{e}_1,\dots,\vec{e}_n\}$ of $\Delta^n$ get mapped to $\Delta^n$, and so $\vec{A}\vec{e}_i \in \Delta^n$. What is $\vec{A}\vec{e}_i$?}
+\end{problem}
+\begin{solution}
+    \todo{Your solution here}
+\end{solution}
+
+In light of the previous result, we can identify the set of all functions from $\Delta^n$ to $\Delta^n$ with the set of
+stochastic matrices, that is,
+\[
+    \Phi \equiv \{\vec{M}\in\Rp^{n\times n} : \vec{M} \text{ is column-stochastic}\}.
+\]
+
+\begin{problem}[10 points]\label{prob:rm for Phi}
+    The set of column-stochastic matrices can be described as the concatenation of $n$ independent columns, each of which is a vector in $\Delta^n$. So, a regret minimizer for $\Phi$ can be constructed by applying the regret circuit for Cartesian product seen in Lecture~5~\citep{Farina19:Regret}. Give pseudocode and a formal regret statement as a function of the regret of the individual regret minimizers for the simplexes in the Cartesian product. Is the regret cumulated up to any time $T$ guaranteed to be sublinear in $T$?
+\end{problem}
+\begin{solution}
+    \todo{Your solution here}
+\end{solution}
+
+\begin{problem}[7 points]\label{prob:fixed point of M}
+    Argue that any column-stochastic matrix $\vec{M}$ admits a fixed point $\vec{x} \in \Delta^n$ such that $\vec{M}\vec{x} = \vec{x}$. Then, propose a way to compute such a fixed point.
+    \hint{for the existence, argue that the function $\vec{x}\mapsto \vec{M}\vec{x}$ satisfies the requirements of Brouwer's fixed point theorem.}
+\end{problem}
+\begin{solution}
+    \todo{Your solution here}
+\end{solution}
+
+\begin{problem}[6 points]\label{prob:swap rm}
+    By combining your solutions to \cref{prob:rm for Phi,prob:fixed point of M}, give a no-swap-regret algorithm for $\Delta^n$ using the construction by Gordon et al. we saw in Lecture~3. What is the bound on the cumulated swap regret? 
+\end{problem}
+\begin{solution}
+    \todo{Your solution here}
+\end{solution}
+
+\begin{problem}[10 bounus points]
+    Compare the algorithm you gave in~\cref{prob:swap rm} to the algorithm proposed by \citet{Blum07:From}. Are the algorithms identical or, if not, how do they differ?
+\end{problem}
+\begin{solution}
+    \todo{Your solution here}
+\end{solution}
+
+\section{Counterfactual Regret Minimization (50 + 10 points)}
+
+In this problem, you will implement the CFR regret minimizer for sequence-form decision problems.
+
+You will run your CFR implementation on three games: rock-paper-superscissors (a simple variant of rock-paper-scissors, where beating paper with scissors gives a payoff of $2$ instead of $1$) and two well-known poker variants: Kuhn poker~\citep{Kuhn50:Simplified} and Leduc poker~\citep{Southey05:Bayes}. A description of each game is given in the zip of this homework, according to the format described in \cref{sec:format}. The zip of the homework also contains a stub Python file to help you set up your implementation. 
+
+\subsection{Format of the game files}\label{sec:format}
+
+Each game is encoded as a json file with the following structure.
+\begin{itemize}
+    \item At the root, we have a dictionary with three keys: \verb|decision_problem_pl1|, \verb|decision_problem_pl2|, and \verb|utility_pl1|. The first two keys contain a description of the tree-form sequential decision problems faced by the two players, while the third is a description of the bilinear utility function for Player 1 as a function of the sequence-form strategies of each player. Since both games are zero-sum, the utility for Player 2 is the opposite of the utility of Player 1.
+    \item The tree of decision points and observation points for each decision problem is stored as a list of nodes. Each node has the following fields
+    \begin{description}
+        \item[\texttt{id}] is a string that represents the identifier of the node. The identifier is unique among the nodes for the same player.
+        \item[\texttt{type}] is a string with value either \verb|decision| (for decision points) or \verb|observation| (for observation points).
+        \item[\texttt{actions}] (only for decision points). This is a set of strings, representing the actions available at the decision node.
+        \item[\texttt{signals}] (only for observation points). This is a set of strings, representing the signals that can be observed at the observation node.
+        \item[\texttt{parent\_edge}] identifies the parent edge of the node. If the node is the root of the tree, then it is \verb|null|. Else, it is a pair \verb|(parent_node_id, action_or_signal)|, where the first member is the \verb|id| of the parent node, and \verb|action_or_signal| is the action or signal that connects the node to its parent.
+        \item[\texttt{parent\_sequence}] (only for decision points). Identifies the parent sequence $p_j$ of the decision point, defined as the last sequence (that is, decision point-action pair) encountered on the path from the root of the
+        decision process to $j$.
+    \end{description}
+    \begin{remark}
+        The list of nodes of the tree-form sequential decision process is given in top-down traversal order. The bottom-up traversal order can be obtained by reading the list of nodes backwards.
+    \end{remark}
+    \item The bilinear utility function for Player~1 is given through the payoff matrix $\vec{A}$ such that the (expected) utility of Player~1 can be written as
+    \[
+        u_1(\vec{x}, \vec{y}) = \vec{x}^\top\!\!\vec{A}\vec{y},
+    \]
+    where $\vec{x}$ and $\vec{y}$ are sequence-form strategies for Players~1 and 2 respectively. We represent $\vec{A}$ in the file as a list of all non-zero matrix entries, storing for each the row index, column index, and value. Specifically, each entry is an object with the fields
+    \begin{description}
+        \item[\texttt{sequence\_pl1}] is a pair \verb|(decision_pt_id_pl1, action_pl1)| which represents the sequence of Player~1 (row of the entry in the matrix).
+        \item[\texttt{sequence\_pl2}] is a pair \verb|(decision_pt_id_pl2, action_pl2)| which represents the sequence of Player~2 (column of the entry in the matrix).
+        \item[\texttt{value}] is the non-zero float value of the matrix entry. 
+    \end{description}
+\end{itemize}
+
+\paragraph{Example: Rock-paper-superscissors}
+
+In the case of rock-paper-superscissors the decision problem faced by each of the players has only one decision points with three actions: playing rock, paper, or superscissors. So, each tree-form sequential decision process only has a single node, which is a decision node. The payoff matrix of the game\footnote{A Nash equilibrium of the game is reached when all players play rock with probability \nicefrac{1}{2}, paper with probability \nicefrac{1}{4} and superscissors with probability \nicefrac{1}{4}. Correspondingly, the game value is $0$.} is
+\begin{center}
+    \begin{tikzpicture}
+        \tikzset{every left delimiter/.style={xshift=1.5ex},
+                every right delimiter/.style={xshift=-1ex}};
+        \matrix [matrix of math nodes,left delimiter=(,right delimiter=),row sep=.008cm,column sep=.008cm,color=black](m)
+        {
+         0 & -1 &  1\\
+         1 &  0 & -2\\
+        -1 &  2 &  0\\
+        };
+        \node at (m-2-3 -| 1.4,0) {.};
+        
+        \node at (m-1-1 -| -1.5,0) {r};
+        \node at (m-2-1 -| -1.5,0) {p};
+        \node at (m-3-1 -| -1.5,0) {s};
+        
+        \node at (m-1-1 |- 0,1.0) {r};
+        \node at (m-1-2 |- 0,1.0) {p};
+        \node at (m-1-3 |- 0,1.0) {s};
+    \end{tikzpicture}
+\end{center}
+So, the game file in this case has content:
+
+{\small\begin{verbatim}
+{
+  "decision_problem_pl1": [
+    {"id": "d1_pl1", "type": "decision", "actions": ["r", "p", "s"],
+     "parent_edge": null, "parent_sequence": null}
+  ],
+  "decision_problem_pl2": [
+    {"id": "d1_pl2", "type": "decision", "actions": ["r", "p", "s"],
+     "parent_edge": null, "parent_sequence": null}
+  ],
+  "utility_pl1": [
+    {"sequence_pl1": ["d1_pl1", "r"], "sequence_pl2": ["d1_pl2", "p"], "value": -1},
+    {"sequence_pl1": ["d1_pl1", "r"], "sequence_pl2": ["d1_pl2", "s"], "value": 1},
+    {"sequence_pl1": ["d1_pl1", "p"], "sequence_pl2": ["d1_pl2", "r"], "value": 1},
+    {"sequence_pl1": ["d1_pl1", "p"], "sequence_pl2": ["d1_pl2", "s"], "value": -2},
+    {"sequence_pl1": ["d1_pl1", "s"], "sequence_pl2": ["d1_pl2", "r"], "value": -1},
+    {"sequence_pl1": ["d1_pl1", "s"], "sequence_pl2": ["d1_pl2", "p"], "value": 2}
+  ]
+}
+\end{verbatim}}
+
+\subsection{Learning to best respond}
+
+Let $Q_1$ and $Q_2$ be the sequence-form strategy polytopes corresponding to the tree-form sequential decision problems faced by Players~1 and 2 respectively.
+%
+A good smoke test when implementing regret minimization algorithms is to verify that they learn to best respond. In particular, you will verify that your implementation of CFR applied to the decision problem of Player~1 learns a best response against Player~2 when Player~2 plays the \emph{uniform} strategy, that is, the strategy that at each decision points picks any of the available actions with equal probability.
+
+
+Let $\vec{u} \in Q_2$ be the sequence-form representation of the strategy for Player~2 that at each decision point selects each of the available actions with equal probability.
+When Player~2 plays according to that strategy, the utility vector for Player~1 is given by $\vec{\ell} \defeq \vec{A}\vec{u}$, where $\vec{A}$ is the payoff matrix of the game.
+
+For each of the three games, take your CFR implementation for the decision problem of Player~1, and let it output strategies $\vec{x}^t \in Q_1$ while giving as feedback at each time $t$ the same utility vector $\vec{\ell}$. As $T \to \infty$, the average strategy 
+\[
+    \bar{\vec{x}}^T \defeq \frac{1}{T} \sum_{t=1}^T \vec{x}^t \in Q_1
+    \numberthis{eq:avg pl1}
+\]
+will converge to a best response to the uniform strategy $\vec{u}$, that is,
+\[
+    \lim_{T\to\infty} (\bar{\vec{x}}^T)^\top\! \vec{A} \vec{u} = \max_{\hat{\vec{x}}\in Q_1}  \hat{\vec{x}}^\top\! \vec{A}\vec{u}.
+\]
+If the above doesn't happen empirically, something is wrong with your implementation.
+
+\begin{problem}[25 points]
+    In each of the three games, apply your CFR implementation to the tree-form sequential decision problem of Player~1, using as local regret minimizer at each decision point the regret matching algorithm (Lecture~4). At each time $t$, give as feedback to the algorithm the same utility vector $\vec{\ell} = \vec{A}\vec{u}$, where $\vec{u}\in Q_2$ is the uniform strategy for Player~2. Run the algorithm for $1000$ iterations. After each iteration $T = 1,\dots,1000$, compute the value of $v^T \defeq (\bar{\vec{x}}^T)^\top\!\vec{A}\vec{u}$ where $\bar{\vec{x}}^T\in Q_1$ is the average strategy output so far by CFR, as defined in~\eqref{eq:avg pl1}. 
+    
+    Plot $v^T$ as a function of $T$. Empirically, what is the limit you observe $v^T$ is converging to?
+    \hint{represent vectors on $\bbR^{|\Sigma|}$ (including the sequence-form strategies output by CFR and utility vectors given to CFR) in memory as dictionaries from sequences (tuples \texttt{(decision\_point\_id, action)}) to floats.}
+    \hint{in rock-paper-superscissor, $v^T$ should approach the value $\nicefrac{1}{3}$. In Kuhn poker, the value \nicefrac{1}{2}. In Leduc poker, the value $2.0875$.}
+\end{problem}
+\begin{solution}
+    \todo{Your solution here. Your solution should include three plots (one for each game), and three values. Don't forget to turn in your implementation.}
+\end{solution}
+
+\subsection{Learning a Nash equilibrium}
+
+Now that you are confident that your implementation of CFR is correct, you will use CFR to converge to Nash equilibrium using the self-play idea described in Lecture~3 and recalled next.
+
+The idea behind using regret minimization to converge to Nash equilibrium in a two-player zero-sum game is to use \emph{self play}. We instantiate two regret minimization algorithms, $\cR_\cX$ and $\cR_\cY$, for the domains of the maximization and minimization problem, respectively. At each time $t$ the two regret minimizers output strategies $\vec{x}^t$ and $\vec{y}^t$, respectively. Then, they receive as feedback the vectors $\vec{\ell}_\cX^t, \vec{\ell}_\cY^t$ defined as
+\begin{equation}\label{eq:utilities self play}
+      \vec{\ell}^t_\cX \defeq \vec{A}\vec{y}^t,\qquad\quad
+      \vec{\ell}^t_\cY \defeq -\vec{A}^\top \vec{x}^t,
+\end{equation}
+where $\vec{A}$ is Player~1's payoff matrix.
+
+We summarize the process pictorially in \cref{fig:no alternation}.
+
+\newcommand{\computeutility}{\tikz[scale=.25]{\draw[thick] (0, 0) -- (1, 0) -- (1, 1) -- (0, 1) -- (0, 0) -- (1.0, 0); \draw[thick] (0, 0) -- (1, 1);}}
+
+\begin{figure}[h]
+    %\vspace{-4mm}
+      \centering
+      \begin{tikzpicture}%[scale=0.75]
+        \begin{scope}[xshift=-7.8cm]
+            \draw[thick] (0, 0) rectangle (1.2, .8);
+            \node at (.6, .4) {$\cR_\cX$};
+            \draw[thick] (0, -1) rectangle (1.2, -0.2);
+            \node at (.6, -.6) {$\cR_\cY$};
+            \draw[->] (1.2, .4) node[above right] {$\vec{x}^1$} -- (2.0, .4);
+            \draw[->] (1.2, -.6) node[above right] {$\vec{y}^1$} -- (2.0, -.6);
+        
+            \draw[thick] (2.0, .2) rectangle (2.4, .6);
+            \draw[thick] (2.0, .2) -- (2.4, .6);
+            \draw[thick] (2.0, -.8) rectangle (2.4, -.4);
+            \draw[thick] (2.0, -.8) -- (2.4, -.4);
+        
+            \draw[->] (2.4, .4) -- (2.6, .4) -- (3.2, -.6) -- (4, -.6) node[above left] {$\vec{\ell}_{\cY}^{1}$};
+            \draw[->] (2.4, -.6) -- (2.6, -.6) -- (3.2, .4) -- (4, .4) node[above left] {$\vec{\ell}_{\cX}^{1}$};
+        
+            \draw[thick] (4, 0) rectangle (5.2, .8);
+            \node at (4.6, .4) {$\cR_\cX$};
+            \draw[thick] (4, -1) rectangle (5.2, -0.2);
+            \node at (4.6, -.6) {$\cR_\cY$};
+            \draw[->] (5.2, .4) node[above right] {$\vec{x}^{2}$} -- (6.0, .4);
+            \draw[->] (5.2, -.6) node[above right] {$\vec{y}^{2}$} -- (6.0, -.6);
+        \end{scope}
+
+
+        \draw[thick] (0, 0) rectangle (1.2, .8);
+        \node at (.6, .4) {$\cR_\cX$};
+        \draw[thick] (0, -1) rectangle (1.2, -0.2);
+        \node at (.6, -.6) {$\cR_\cY$};
+        \draw[->] (-.8, .4) -- (0, .4) node[above left] {$\vec{\ell}_{\cX}^{t-1}$};
+        \draw[->] (-.8, -.6) -- (0, -.6) node[above left] {$\vec{\ell}_{\cY}^{t-1}$};
+        \draw[->] (1.2, .4) node[above right] {$\vec{x}^t$} -- (2.0, .4);
+        \draw[->] (1.2, -.6) node[above right] {$\vec{y}^t$} -- (2.0, -.6);
+    
+        \draw[thick] (2.0, .2) rectangle (2.4, .6);
+        \draw[thick] (2.0, .2) -- (2.4, .6);
+        \draw[thick] (2.0, -.8) rectangle (2.4, -.4);
+        \draw[thick] (2.0, -.8) -- (2.4, -.4);
+    
+        \draw[->] (2.4, .4) -- (2.6, .4) -- (3.2, -.6) -- (4, -.6) node[above left] {$\vec{\ell}_{\cY}^{t}$};
+        \draw[->] (2.4, -.6) -- (2.6, -.6) -- (3.2, .4) -- (4, .4) node[above left] {$\vec{\ell}_{\cX}^{t}$};
+    
+        \draw[thick] (4, 0) rectangle (5.2, .8);
+        \node at (4.6, .4) {$\cR_\cX$};
+        \draw[thick] (4, -1) rectangle (5.2, -0.2);
+        \node at (4.6, -.6) {$\cR_\cY$};
+        \draw[->] (5.2, .4) node[above right] {$\vec{x}^{t+1}$} -- (6.0, .4);
+        \draw[->] (5.2, -.6) node[above right] {$\vec{y}^{t+1}$} -- (6.0, -.6);
+    
+        \node at (6.5, -0.1) {$\cdots$};
+        \node at (-1.3, -0.1) {$\cdots$};
+      \end{tikzpicture}
+      %\vspace{-4mm}
+      \caption{The flow of strategies and utilities in regret minimization for games.
+        The symbol \protect\computeutility{} denotes computation/construction of the utility vector.}
+      \label{fig:no alternation}
+    \end{figure}
+
+    A well known folk theorem establish that the pair of average strategies produced by the regret minimizers up to any time $T$ converges to a Nash equilibrium, where convergence is measured via the \emph{saddle point gap}
+    \[
+        0 \le \gamma(\vec{x},\vec{y}) \defeq \Big(\max_{\xhat\in\cX} \{ \xhat^\top \vec{A}\vec{y}  \} - \vec{x}^\top \vec{A} \vec{y}\Big) + \Big( \vec{x}^\top \vec{A} \vec{y} - \min_{\yhat \in \cY} \{\vec{x}^\top \vec{A} \yhat\}\Big) = \max_{\xhat\in\cX} \{ \xhat^\top \vec{A}\vec{y}  \}  - \min_{\yhat\in\cY} \{ \vec{x}^\top \vec{A}\yhat  \}.
+    \] 
+    A point $(\vec{x},\vec{y})\in \cX\times\cY$ has zero saddle point gap if and only if it is a Nash equilibrium of the game. 
+
+    \begin{theorem}\label{thm:folk}
+        Consider the self-play setup summarized in \cref{fig:no alternation}, where $\cR_\cX$ and $\cR_\cY$ are regret minimizers for the sets $\cX$ and $\cY$, respectively. Let $R_\cX^T$ and $R_\cY^T$ be the (sublinear) regret cumulated by $\cR_\cX$ and $\cR_\cY$, respectively, up to time $T$, and let $\bar{\vec{x}}^T$ and $\bar{\vec{y}}^T$ denote the average of the strategies produced up to time $T$, that is,
+        \[
+            \bar{\vec{x}}^T \defeq \frac{1}{T}\sum_{t=1}^T \vec{x}^t, \qquad  
+            \bar{\vec{y}}^T \defeq \frac{1}{T}\sum_{t=1}^T \vec{y}^t  
+            \numberthis{eq:constant avg}
+        .\]
+        Then, the saddle point gap $\gamma(\bar{\vec{x}}^T, \bar{\vec{y}}^T)$ of $(\bar{\vec{x}}^T, \bar{\vec{y}}^T)$ satisfies  
+        \[
+            \gamma(\bar{\vec{x}}^T, \bar{\vec{y}}^T) \le \frac{R_\cX^T + R_\cY^T}{T} \to 0 \qquad \text{as } T\to\infty.  
+        \]
+\end{theorem}
+
+
+\begin{problem}[25 points]
+    Let the CFR implementation (using regret matching as the local regret minimizer at each decision point) for Player~1's and Player~2's tree-form sequential decision problems play against each other in self play, as described above.
+    
+    Plot the saddle point gap and the expected utility (for Player~1) of the average strategies $\gamma(\bar{\vec{x}}^T, \bar{\vec{y}}^T)$ as a function of the number of iterations $T = 1,\dots,1000$.
+    \hint{represent vectors on $\bbR^{|\Sigma|}$ (including the sequence-form strategies output by CFR and utility vectors given to CFR) in memory as dictionaries from sequences (tuples \texttt{(decision\_point\_id, action)}) to floats.}
+    \hint{to compute the saddle-point gap, feel free to use the function \texttt{gap(game, strategy\_pl1, strategy\_pl2)} provided in the Python stub file.}
+    \hint{the saddle point gap shuold be going to zero. The expected utility of the average strategies in rock-paper-superscissor should approach the value $0$. In Kuhn poker it should approach $-0.055$. In Leduc poker it should approach $-0.085$.}
+\end{problem}
+\begin{solution}
+    \todo{Your solution here. Your solution should include six plots (two for each game---one for the saddle point gap and one for the utility). Don't forget to turn in your implementation.}
+\end{solution}
+
+\subsection{Bonus: CFR+}
+
+To achieve better performance in practice when learning Nash equilibria in two-player zero-sum games, people often make the following modifications to the setup of the previous subsection.
+\begin{itemize}
+    \item Instead of regret matching, CFR is set up to use the regret matching plus algorithm (see Lecture~3) at each decision point.
+    \item Instead of using the classical self-play scheme described in \cref{fig:no alternation}, people \emph{alternate} the iterates and feedback as described in \cref{fig:alternation},
+    where the utility vector $\vec{\ell}_\cX^t$ is as defined in~\eqref{eq:utilities self play}, whereas
+    \[
+        \tilde{\vec{\ell}}_\cY^t \defeq -\vec{A}^\top \vec{x}^{t+1}.
+    \]    
+    (Note that at the very beginning, $\vec{x}^1$ does not participate in the computation of any utility vector).
+    \begin{figure}[H]
+        \centering
+        \begin{tikzpicture}[scale=.96]
+            \begin{scope}[xshift=-8.8cm]
+                \draw[thick] (0, 0) rectangle (1.2, .8);
+                \node at (.6, .4) {$\cR_\cX$};
+                \draw[thick] (0, -1.2) rectangle (1.2, -0.4);
+                \node at (.6, -.8) {$\cR_\cY$};
+                \draw[->] (1.2, .4) node[above right] {$\vec{x}^1$} -- (2.0, .4);
+                \draw[->] (1.2, -.8) node[below right] {$\vec{y}^1$} -- (2.0, -.8);
+
+                \draw[thick] (2.0, .2) rectangle (2.4, .6);
+                \draw[thick] (2.0, .2) -- (2.4, .6);
+                \draw[thick] (2.0, -1.0) rectangle (2.4, -.6);
+                \draw[thick] (2.0, -1.0) -- (2.4, -.6);
+
+                \draw[->] (2.4, -.8) -- (2.6, -.8) -- (3.2, .4) -- (4, .4) node[above left] {$\vec{\ell}_\cX^{1}$};
+
+                \draw[thick] (4, 0) rectangle (5.2, .8);
+                \node at (4.6, .4) {$\cR_\cX$};
+                \draw[thick] (4, -1.2) rectangle (5.2, -0.4);
+                \node at (4.6, -.8) {$\cR_\cY$};
+                \draw[->] (5.2, .4) node[above right] {$\vec{x}^{2}$} -- (6.0, .4);
+
+                \draw[thick] (6.0, .2) rectangle (6.4, .6);
+                \draw[thick] (6.0, .2) -- (6.4, .6);
+
+                \draw[->] (6.4, .4) -- (6.6, .4) -- (6.6, -.2) -- (3.4, -.2) -- (3.4, -.8) -- (4, -.8) node[below left] {$\tilde{\vec{\ell}}_\cY^{1}$};
+
+                \draw[->] (5.2, -.8) node[below right,yshift=-1mm] {$\vec{y}^{2}$} -- (6.0, -.8);
+
+                \draw[thick] (6.0, -1.0) rectangle (6.4, -.6);
+                \draw[thick] (6.0, -1.0) -- (6.4, -.6);
+
+                \draw (6.4, -.8) -- (6.6, -.8) -- (6.7, -.7);
+            \end{scope}
+
+            \draw[thick] (0, 0) rectangle (1.2, .8);
+            \node at (.6, .4) {$\cR_\cX$};
+            \draw[thick] (0, -1.2) rectangle (1.2, -0.4);
+            \node at (.6, -.8) {$\cR_\cY$};
+            \draw[->] (-.8, .4) -- (0, .4) node[above left] {$\vec{\ell}_{\cX}^{t-1}$};
+            \draw[->] (1.2, .4) node[above right] {$\vec{x}^t$} -- (2.0, .4);
+            \draw[->] (1.2, -.8) node[below right] {$\vec{y}^t$} -- (2.0, -.8);
+        
+            \draw[thick] (2.0, .2) rectangle (2.4, .6);
+            \draw[thick] (2.0, .2) -- (2.4, .6);
+            \draw[thick] (2.0, -1.0) rectangle (2.4, -.6);
+            \draw[thick] (2.0, -1.0) -- (2.4, -.6);
+        
+            \draw[->] (2.4, .4) -- (2.6, .4) -- (2.6, -.2) -- (-.6, -.2) -- (-.6, -.8) -- (0, -.8) node[below left] {$\tilde{\vec{\ell}}_{\cY}^{t-1}$};
+            \draw[->] (2.4, -.8) -- (2.6, -.8) -- (3.2, .4) -- (4, .4) node[above left] {$\ell_\cX^{t}$};
+        
+            \draw[thick] (4, 0) rectangle (5.2, .8);
+            \node at (4.6, .4) {$\cR_\cX$};
+            \draw[thick] (4, -1.2) rectangle (5.2, -0.4);
+            \node at (4.6, -.8) {$\cR_\cY$};
+            \draw[->] (5.2, .4) node[above right] {$\vec{x}^{t+1}$} -- (6.0, .4);
+        
+            \draw[thick] (6.0, .2) rectangle (6.4, .6);
+            \draw[thick] (6.0, .2) -- (6.4, .6);
+        
+            \draw[->] (6.4, .4) -- (6.6, .4) -- (6.6, -.2) -- (3.4, -.2) -- (3.4, -.8) -- (4, -.8) node[below left] {$\tilde{\vec{\ell}}_\cY^{t}$};
+        
+            \draw[->] (5.2, -.8) node[below right,yshift=-1mm] {$\vec{y}^{t+1}$} -- (6.0, -.8);
+        
+            \draw[thick] (6.0, -1.0) rectangle (6.4, -.6);
+            \draw[thick] (6.0, -1.0) -- (6.4, -.6);
+        
+            \draw (6.4, -.8) -- (6.6, -.8) -- (6.7, -.7);
+        
+        
+            \node at (7.05, -0.1) {$\cdots$};
+            \node at (-1.4, -0.1) {$\cdots$};
+        \end{tikzpicture}
+        \caption{The alternation method for CFR in games. The symbol
+        \protect\computeutility{} denotes computation/construction of the utility vector.}
+        \label{fig:alternation}
+    \end{figure}
+    \item Finally, the \emph{linear average} of the strategies, defined as the weighted averages
+    \[
+        \dbar{\vec{x}}^T \defeq \frac{2}{T(T+1)}\sum_{t=1}^T t\cdot\vec{x}^t, \qquad  
+        \dbar{\vec{y}}^T \defeq \frac{2}{T(T+1)}\sum_{t=1}^T t\cdot\vec{y}^t  
+    \]
+    is considered instead of the regular averages~\eqref{eq:constant avg} when computing the saddle point gap.
+\end{itemize}
+Collectively, the modified setup we just described is referred to as ``running CFR+''.
+
+\begin{problem}[10 bonus points]
+    Modify your implementation of CFR to match the CFR+ self-play setup described above. Run CFR+ for $1000$ iterations, plotting the expected utility for Player~1 and the saddle point gap of the linear averages $\gamma(\dbar{\vec{x}}^T, \dbar{\vec{y}}^T)$ after each iteration $T$.
+    \hint{represent vectors on $\bbR^{|\Sigma|}$ (including the sequence-form strategies output by CFR and utility vectors given to CFR) in memory as dictionaries from sequences (tuples \texttt{(decision\_point\_id, action)}) to floats.}
+    \hint{to compute the saddle-point gap, feel free to use the function \texttt{gap(game, strategy\_pl1, strategy\_pl2)} provided in the Python stub file.}
+\end{problem}
+\begin{solution}
+    \todo{Your solution here. Your solution should include six plots (two for each game---one for the saddle point gap and one for the utility). Don't forget to turn in your implementation.}
+\end{solution}
+
+
+\bibliographystyle{unsrtnat}
+\bibliography{references}
+
+\end{document}

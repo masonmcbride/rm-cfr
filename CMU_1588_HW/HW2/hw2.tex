@@ -1,0 +1,578 @@
+\documentclass{homework}
+\usepackage{gabri_notation}
+\usepackage{tikz-qtree}
+
+\course{15-888 Computational Game Solving (Fall 2021)}
+\homework{2}
+\releasedate{Oct. 9, 2021}
+\duedate{Oct. 19, 2021, beginning of class}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\student{\todo{Your Andrew ID here}}
+
+\newcommand{\negent}{\omega}
+
+\begin{document}
+
+\maketitle
+
+\paragraph{Instructions} Please typeset your solution in the \texttt{.tex} file provided in the homework \texttt{.zip}. Attach a readable printout of your code at the end of the document. Turn in your printed solution at the beginning of class on October 19th. Don't forget to fill in your student ID above :-)
+
+\paragraph{Bonus points} This homework contains 2 problems (each split into smaller tasks), for a total of 120 points. The goal of the 20 bonus points is to help you in case you lost some points here and there. The maximum score for the homework will be capped at 100. In other words, your score will be set to the minimum between 100 and the sum of the points you scored on all questions, including the bonus questions.
+
+\section{Optimistic multiplicative weights update (40 + 10 points)}
+
+\emph{Multiplicative weights update (MWU)} and its predictive variant called
+\emph{optimistic multiplicative weights update (OMWU)} are popular regret minimization algorithms for the probability simplex
+\[
+    \Delta^n \defeq \{(x_1, \dots, x_n) \in \bbR^n_{\ge 0}: x_1 + \dots + x_n = 1\}.
+    \numberthis{eq:def simplex}
+\]
+They enjoy many strong theoretical properties, and were involved in a series of important papers in game theory.
+%
+In this question, you will derive and analyze MWU and OMWU from first principles.
+
+\subsection{The negative entropy regularizer (10 points)}
+
+OMWU is just a special name for the predictive FTRL algorithm when the regularizer $\negent : \Delta^n \to \bbR$ is chosen to be the \emph{negative entropy regularizer} 
+\[
+    \negent(\vec{x}) \defeq \sum_{i=1}^n x_i \log(x_i).
+\]
+To avoid annoying issues with the logarithm of $0$, we will only ever evaluate and differentiate $\negent$ in the relative interior of $\Delta^n$, that is the set 
+\[
+    \relint \Delta^n = \{(x_1, \dots, x_n) \in \bbR^n_{> 0}: x_1 + \dots + x_n = 1\}
+\]
+(note the strict inequality $\bbR_{> 0}$, as opposed to $\bbR_{\ge 0}$ in~\eqref{eq:def simplex}).
+
+For $\negent$ to be a valid choice of regularizer in predictive FTRL, we need to check that $\negent$ is $1$-strongly convex with respect to some norm. In particular, it turns out that $\negent$ is $1$-strongly convex both with respect to the Euclidean norm
+\[
+    \|\vec{x}\|_2 \defeq \sqrt{\sum_{i=1}^n x_i^2} \qquad \forall\,\vec{x} \in \bbR^n
+\]and with respect to the $\ell_1$ norm
+\[
+    \|\vec{x}\|_1 \defeq \sum_{i=1}^n |x_i| \qquad\forall\, \vec{x}\in\bbR^n.
+\]
+
+The easiest way to verify strong convexity in this case passes through the following well-known characterization.
+\begin{lemma}\label{lem:hessian criterion}
+    Let $\cX \subseteq \bbR^n$ be a convex set, $f : \cX \to \bbR$ be a twice-differentiable function with Hessian matrix $\nabla^2 f(\vec{x})$ at every $\vec{x}\in\cX$, and $\|\cdot\|$ be a norm. If
+    \[
+        \vec{u}^\top \nabla^2 f(\vec{x})\, \vec{u} \ge \|\vec{u}\|^2 \qquad \forall\, \vec{u}\in\bbR^n, \vec{x} \in \cX,
+    \]   
+    then $f$ is $1$-strongly convex on $\cX$ with respect to norm $\|\cdot\|$.
+\end{lemma}
+In the next two exercises you will use \cref{lem:hessian criterion} to verify that $\negent$ is $1$-strongly convex on $\relint\Delta^n$ with respect to $\|\cdot\|_2$ and $\|\cdot\|_1$.
+
+\begin{problem}[5 points]\label{prob:strong convexity ell2}
+    Apply \cref{lem:hessian criterion} for $\cX = \relint\Delta^n$, $f = \negent$, and $\|\cdot\| = \|\cdot\|_2$ and conclude that $\negent$ is $1$-strongly convex with respect to the Euclidean norm on $\relint\Delta^n$.
+    \hint{the Hessian matrix of $\negent$ is particularly nice. Start by working that out first.}
+    \hint{at some point, it might be useful to argue that $1/x_i \ge 1$ for any $i\in\{1,\dots,n\}$ whenever $\vec{x}\in\relint\Delta^n$.}
+\end{problem}
+\begin{solution}
+    \todo{Your solution here}
+\end{solution}
+
+\begin{problem}[5 points]\label{prob:strong convexity ell1}
+    Apply \cref{lem:hessian criterion} for $\cX = \relint\Delta^n$, $f = \negent$, and $\|\cdot\| = \|\cdot\|_1$ and conclude that $\negent$ is $1$-strongly convex with respect to the $\ell_1$ norm on $\relint\Delta^n$.
+    \hint{The Cauchy-Schwarz inequality asserts that for any pair of vectors $\vec{a},\vec{b}\in\bbR^n$,
+    \[
+        \mleft(\sum_{i=1}^n a_i b_i\mright)^2 \le \mleft(\sum_{i=1}^n a_i^2\mright)\mleft(\sum_{i=1}^n b_i^2\mright).
+        \numberthis{eq:cauchy schwarz}
+    \]
+    Now, let $\vec{x} \in \relint\Delta^n$ and $\vec{u} \in \bbR^n$, and consider the vectors 
+    $\vec{a} \defeq (u_1/\sqrt{x_i}, \dots, u_n/\sqrt{x_n})$ and $\vec{b} \defeq (\sqrt{x_1}, \dots, \sqrt{x_n})$. What happens if you plug them into~\eqref{eq:cauchy schwarz}? Don't forget that $x_1 + \dots + x_n = 1$ since $\vec{x} \in \relint\Delta^n$.
+    }
+\end{problem}
+\begin{solution}
+    \todo{Your solution here}
+\end{solution}
+
+\subsection{Gradient of $\negent$ and of its conjugate (15 points)}
+
+In this subsection, you will derive a formula for the gradient of $\negent$ and for the gradient of its convex conjugate. Let's start with the gradient.
+
+\begin{problem}[5 points]\label{prob:gradient of varphi}
+    Give an expression for the gradient of $\negent$ at any point $\vec{x} \in \relint\Delta^n$.
+\end{problem}
+\begin{solution}
+    \todo{Your solution here}
+\end{solution}
+
+Now, let's focus on the gradient of the convex conjugate of $\negent$, that is, the solution to the optimization problem 
+\[
+    \nabla\negent^*(\vec{g}) \defeq \argmax_{\xhat\in\relint\Delta^n} \{\vec{g}^\top \xhat - \negent(\xhat)\}.
+    \numberthis{eq:argconjugate}
+\]
+Problem~\eqref{eq:argconjugate} is a \emph{constrained} optimization problem, since the optimization variable $\xhat$ is constrained to satisfy $\xhat \in \relint\Delta^n$. Call $\vec{x}^*$ the optimal solution to~\eqref{eq:argconjugate}. As a result of an important theorem in optimization theory (the Lagrange multiplier theorem), there exists a constant (called \emph{Lagrange multiplier}) $\alpha \in \bbR$ such that
+\[
+    \vec{g} - \nabla\negent(\vec{x}^*) = \alpha \vec{1},
+    \numberthis{eq:stationarity}
+\]
+where $\vec{1} \in \bbR^n$ is the vector of all ones.
+
+\begin{problem}[5 points]
+    Plug in the expression for the gradient of $\negent$ that you developed in \cref{prob:gradient of varphi} into~\eqref{eq:stationarity}. Note that~\eqref{eq:stationarity} is a vector equation, and therefore it is equivalent to a system of $n$ scalar equations. Isolate and solve for $x^*_i$ for every $i \in \{1,\dots,n\}$, and show that 
+    \[
+        x_i^* = e^{-1-\alpha} \cdot e^{g_i} \qquad\forall\, i \in \{1,\dots,n\}. 
+        \numberthis{eq:x star i}
+    \]
+\end{problem}
+\begin{solution}
+    \todo{Your solution here}
+\end{solution}
+
+\begin{problem}[5 points]\label{prob:argconj of entropy}
+    Use \cref{eq:x star i} together with the fact that the sum of the entries of $\vec{x}^* \in \relint\Delta^n$ must be $1$ to solve for the value of the Lagrange multiplier $\alpha$. Then, plug in the value of $\alpha$ to conclude that for any $\vec{g}\in\bbR^n$, $\nabla\negent^*(\vec{g})$---that is, the solution to the argmax in~\eqref{eq:argconjugate}---satisfies
+    \[
+        x^*_i = \frac{e^{g_i}}{\sum_{j=1}^n e^{g_j}} \qquad\forall\, i \in \{1,\dots,n\}.
+    \]
+\end{problem}
+\begin{solution}
+    \todo{Your solution here}
+\end{solution}
+
+
+\subsection{OMWU as predictive FTRL (15 points)}\label{sec:omwu as ftrl}
+
+Now that we verified that $\negent$ is $1$-strongly convex, we can safely run predictive FTRL with $\negent$ as a regularizer. As a reminder, predictive FTRL is the algorithm recalled in \cref{algo:predictive ftrl}. In our case, $\cX$ will be the relative interior $\relint\Delta^n$ of the probability simplex $\Delta^n$, the regularizer $\varphi$ will be the negative entropy function $\negent$, and $\eta > 0$ will be a generic stepsize. The resulting algorithm is called OMWU.
+
+\begin{figure}[th]\centering
+    \begin{minipage}[t]{.485\linewidth}
+        \SetInd{0.25em}{0.4em}
+        \begin{algorithm}[H]\caption{Predictive FTRL}\label{algo:predictive ftrl}
+            \DontPrintSemicolon
+            \KwData{$\cX \subseteq \bbR^n$ convex domain\\
+                   \hspace{0.5cm}$\varphi : \cX \to \bbR_{\ge 0}$ strongly convex regularizer\hspace*{-1cm}\\
+                   \hspace{.5cm}$\eta > 0$ step-size parameter}
+            \BlankLine
+            $\vec{L}^0 \gets \vec{0} \in \bbR^n$\;
+            \Hline{}
+            \Fn{\normalfont\textsc{NextStrategy}($\vec{m}^{t}$)}{
+                \Comment{\color{commentcolor} Set $\vec{m}^t = \vec{0}$ for non-predictive version]}\vspace{1mm}
+                \Return{$\displaystyle\argmax_{\xhat \in \cX} \mleft\{(\vec{L}^{t-1} + \vec{m}^t)^\top \xhat - \frac{1}{\eta}\varphi(\xhat)\mright\}$}\hspace*{-4cm}\;\label{line:ftrl next strategy}\vspace{1mm}
+            }
+            \Hline{}
+            \Fn{\normalfont\textsc{ObserveUtility}($\vec{\ell}^{t}$)}{
+                \vspace{2mm}$\vec{L}^{t} \gets \vec{L}^{t-1} + \vec{\ell}^t$\vspace{2.5mm}\;
+            }
+        \end{algorithm}
+    \end{minipage}
+    \hfill
+    \begin{minipage}[t]{.485\linewidth}
+        \SetInd{0.25em}{0.4em}
+        \begin{algorithm}[H]\caption{Predictive OMD}\label{algo:predictive omd}
+            \DontPrintSemicolon
+            \KwData{$\cX \subseteq \bbR^n$ convex domain\\
+            \hspace{0.5cm}$\varphi : \cX \to \bbR_{\ge 0}$ strongly convex regularizer\hspace*{-1cm}\\
+            \hspace{.5cm}$\eta > 0$ step-size parameter}
+            \BlankLine
+            $\vec{z}^0 \gets \argmin_{\vec{z} \in \cX} \negent(\vec{z})$\;\label{line:omd setup}\vspace{.0mm}
+            \Hline{}
+            \Fn{\normalfont\textsc{NextStrategy}($\vec{m}^{t}$)}{
+                \Comment{\color{commentcolor} Set $\vec{m}^t = \vec{0}$ for non-predictive version]}\vspace{1mm}
+                \Return{$\displaystyle\argmax_{\xhat \in \cX} \mleft\{(\vec{m}^t)^\top \xhat - \frac{1}{\eta}\div{\xhat}{\vec{z}^{t-1}}\mright\}$}\hspace*{-3cm}\;\label{line:omd next xt}\vspace{1mm}
+            }
+            \Hline{}
+            \Fn{\normalfont\textsc{ObserveUtility}($\vec{\ell}^{t}$)}{
+                $\displaystyle\vec{z}^{t} \gets \argmax_{\zhat \in \cX}\mleft\{(\vec{\ell}^t)^\top \zhat - \frac{1}{\eta}\div{\zhat}{\vec{z}^{t-1}}\mright\}$\;\label{line:omd next zt}
+            }
+        \end{algorithm}
+    \end{minipage}
+\end{figure}
+
+
+\begin{problem}[10 points]
+    Use the characterization of $\nabla\negent^*(\vec{g})$ given in the statement of \cref{prob:argconj of entropy} to prove that at times $t = 2,3,\dots$, for all $i \in \{1, \dots, n\}$, the strategies $\vec{x}^t \in \Delta^n$ produced by OMWU satisfy\footnote{For readability we used the notation $\exp\{\bullet\}$ to mean $e^\bullet$.}
+    \[
+        x^t_i = \frac{x^{t-1}_i\,\exp\{\eta(\ell^{t-1}_i - m^{t-1}_i + m^t_i)\}}{
+            \sum_{j=1}^n x^{t-1}_j\,\exp\{\eta(\ell^{t-1}_j - m^{t-1}_j + m^t_j)\},
+        }
+    \]
+\end{problem}
+\begin{solution}
+    \todo{Your solution here}
+\end{solution}
+
+Since OMWU is just predictive FTRL, we can use the known regret bound for predictive FTRL we saw in class---and the following proposition recalls---to give a regret guarantee for OMWU. 
+
+\begin{proposition}\label{prop:ftrl regret bound}
+    Consider the predictive FTRL algorithm given in \cref{algo:predictive ftrl}. Let $\Omega$ denote the range of $\varphi$ over $\cX$, that is, $\Omega \defeq \max_{\vec{x},\vec{x}'\in\cX} \{\varphi(\vec{x}) - \varphi(\vec{x}')\}$. For any $T$, the regret cumulated up to time $T$ satisfies
+    \begin{equation*}
+        R^T \le \frac{\Omega}{\eta} + \eta\sum_{t=1}^T \|\vec{\ell}^t - \vec{m}^t\|_*^2 - \frac{1}{4\eta} \sum_{t=2}^{T} \|\vec{x}^{t} - \vec{x}^{t-1}\|^2,
+    \end{equation*}
+    where $\|\cdot\|$ is any norm with respect to which $\varphi$ is $1$-strongly convex, and $\|\cdot\|_*$ is the dual of the norm $\|\cdot\|$.
+\end{proposition}
+
+\cref{prop:ftrl regret bound} was stated in general for any instantiation of FTRL. In the particular case of OMWU, the negative entropy function $\negent$ was proven to be $1$-strongly convex with respect to both the Euclidean norm (\cref{prob:strong convexity ell2}) and the $\ell_1$ norm (\cref{prob:strong convexity ell1}). So, in principle, either norm can be used in \cref{prop:ftrl regret bound}. However, one choice dominates the other.
+
+\begin{problem}[2 points]
+    The negative entropy function $\negent$ is $1$-strongly convex with respect to both the Euclidean norm (\cref{prob:strong convexity ell2}) and the $\ell_1$ norm (\cref{prob:strong convexity ell1}). So, in principle, either norm can be used when invoking \cref{prop:ftrl regret bound}. Which norm do you think leads to a stronger regret bound, and why?
+\end{problem}
+\begin{solution}
+    \todo{Your solution here} 
+\end{solution}
+
+\begin{problem}[3 points]
+    Prove that the range $\Omega = \sup_{\vec{x},\vec{x}'\in\relint\Delta^n}\{\negent(\vec{x}) - \negent(\vec{x}')\}$ of $\negent$ on $\relint\Delta^n$ is $\Omega = \log n$. Then, use \cref{prop:ftrl regret bound}---which was stated in general for any instantiation of FTRL---to argue that OMWU for the simplex $\Delta^n$ satisfies the regret bound
+    \[
+        R^T \le \frac{\log n}{\eta} + \eta\sum_{t=1}^T \|\vec{\ell}^t - \vec{m}^t\|_\infty^2 - \frac{1}{4\eta} \sum_{t=2}^{T} \|\vec{x}^{t} - \vec{x}^{t-1}\|_1^2.
+    \]
+    \hint{The minimizer $\vec{x}^*$ of $\negent$ over $\relint\Delta^n$ is $\nabla\negent^*(\vec{0})$. You already know how to compute this from \cref{prob:argconj of entropy}.}
+    \hint{The supremum of $\negent$ over $\relint\Delta^n$ is $0$ (you should prove this).}
+    \hint{You can take for granted the fact that $\|\cdot\|_\infty$ is the dual norm of $\|\cdot\|_1$.}
+\end{problem}
+\begin{solution}    
+    \todo{Your solution here}
+\end{solution}
+
+
+\subsection{OMWU as predictive OMD (10 bonus points)}
+It turns out that OMWU---which was defined as the instance of predictive FTRL in which the regularizer is set the negative entropy function---is equivalent to predictive OMD with negative entropy function, in the sense that the two algorithms produce the same iterates at every time $t$. Predictive OMD is recalled in \cref{algo:predictive omd}. As a reminder, the Bregman divergence $\div{\cdot}{\cdot}$ is defined with respect to any regularizer $\varphi$ and any two points $\vec{x},\vec{c}$ as
+\[
+    \div{\vec{x}}{\vec{c}} \defeq \varphi(\vec{x}) - \varphi(\vec{c}) - \nabla\varphi(\vec{c})^\top(\vec{x} - \vec{c}).
+\]
+
+\begin{problem}[10 bonus points]
+    Consider the predictive OMD algorithm (\cref{algo:predictive omd}), where $\cX$ is set to be the relative interior $\relint\Delta^n$ of the $n$-simplex, the regularizer $\varphi$ is set to be the negative entropy function $\negent$, and $\eta > 0$ is a generic stepsize. Prove that the iterates produced by that algorithm coincide with those produced by OMWU as defined in \cref{sec:omwu as ftrl}.
+\end{problem}
+\begin{solution}
+    \todo{Your solution here}
+\end{solution}
+
+
+\section{Linear programming for solving zero-sum games, and application to low randomization in poker (60 + 10 points)}
+
+In many games, the optimal Nash equilibrium requires that all players randomize their moves. As an example, consider rock-paper-scissors: any deterministic strategy (for example, always playing rock) is heavily suboptimal. In this problem, you will quantify how much value is lost by insisting on playing deterministic strategies in the three games of Homework~$1$: rock-paper-superscissors and two well-known poker variants---Kuhn poker~\citep{Kuhn50:Simplified} and Leduc poker~\citep{Southey05:Bayes}. A description of each game is given in the zip of this homework, according to the same format of Homework~$1$, recalled in \cref{sec:format}. The zip of the homework also contains a stub Python file to help you set up your implementation. 
+
+\subsection{Format of the game files}\label{sec:format}
+
+Each game is encoded as a json file with the following structure.
+\begin{itemize}
+    \item At the root, we have a dictionary with three keys: \verb|decision_problem_pl1|, \verb|decision_problem_pl2|, and \verb|utility_pl1|. The first two keys contain a description of the tree-form sequential decision problems faced by the two players, while the third is a description of the bilinear utility function for Player 1 as a function of the sequence-form strategies of each player. Since both games are zero-sum, the utility for Player 2 is the opposite of the utility of Player 1.
+    \item The tree of decision points and observation points for each decision problem is stored as a list of nodes. Each node has the following fields
+    \begin{description}
+        \item[\texttt{id}] is a string that represents the identifier of the node. The identifier is unique among the nodes for the same player.
+        \item[\texttt{type}] is a string with value either \verb|decision| (for decision points) or \verb|observation| (for observation points).
+        \item[\texttt{actions}] (only for decision points). This is a set of strings, representing the actions available at the decision node.
+        \item[\texttt{signals}] (only for observation points). This is a set of strings, representing the signals that can be observed at the observation node.
+        \item[\texttt{parent\_edge}] identifies the parent edge of the node. If the node is the root of the tree, then it is \verb|null|. Else, it is a pair \verb|(parent_node_id, action_or_signal)|, where the first member is the \verb|id| of the parent node, and \verb|action_or_signal| is the action or signal that connects the node to its parent.
+        \item[\texttt{parent\_sequence}] (only for decision points). Identifies the parent sequence $p_j$ of the decision point, defined as the last sequence (that is, decision point-action pair) encountered on the path from the root of the
+        decision process to $j$.
+    \end{description}
+    \begin{remark}
+        The list of nodes of the tree-form sequential decision process is given in top-down traversal order. The bottom-up traversal order can be obtained by reading the list of nodes backwards.
+    \end{remark}
+    \item The bilinear utility function for Player~1 is given through the payoff matrix $\vec{A}$ such that the (expected) utility of Player~1 can be written as
+    \[
+        u_1(\vec{x}, \vec{y}) = \vec{x}^\top\!\!\vec{A}\vec{y},
+    \]
+    where $\vec{x}$ and $\vec{y}$ are sequence-form strategies for Players~1 and 2 respectively. We represent $\vec{A}$ in the file as a list of all non-zero matrix entries, storing for each the row index, column index, and value. Specifically, each entry is an object with the fields
+    \begin{description}
+        \item[\texttt{sequence\_pl1}] is a pair \verb|(decision_pt_id_pl1, action_pl1)| which represents the sequence of Player~1 (row of the entry in the matrix).
+        \item[\texttt{sequence\_pl2}] is a pair \verb|(decision_pt_id_pl2, action_pl2)| which represents the sequence of Player~2 (column of the entry in the matrix).
+        \item[\texttt{value}] is the non-zero float value of the matrix entry. 
+    \end{description}
+\end{itemize}
+
+\paragraph{Example: Rock-paper-superscissors}
+
+In the case of rock-paper-superscissors the decision problem faced by each of the players has only one decision points with three actions: playing rock, paper, or superscissors. So, each tree-form sequential decision process only has a single node, which is a decision node. The payoff matrix of the game is
+\begin{center}
+    \begin{tikzpicture}
+        \tikzset{every left delimiter/.style={xshift=1.5ex},
+                every right delimiter/.style={xshift=-1ex}};
+        \matrix [matrix of math nodes,left delimiter=(,right delimiter=),row sep=.008cm,column sep=.008cm,color=black](m)
+        {
+         0 & -1 &  1\\
+         1 &  0 & -2\\
+        -1 &  2 &  0\\
+        };
+        \node at (m-2-3 -| 1.4,0) {.};
+        
+        \node at (m-1-1 -| -1.5,0) {r};
+        \node at (m-2-1 -| -1.5,0) {p};
+        \node at (m-3-1 -| -1.5,0) {s};
+        
+        \node at (m-1-1 |- 0,1.0) {r};
+        \node at (m-1-2 |- 0,1.0) {p};
+        \node at (m-1-3 |- 0,1.0) {s};
+    \end{tikzpicture}
+\end{center}
+So, the game file in this case has content:
+
+{\small\begin{verbatim}
+{
+  "decision_problem_pl1": [
+    {"id": "d1_pl1", "type": "decision", "actions": ["r", "p", "s"],
+     "parent_edge": null, "parent_sequence": null}
+  ],
+  "decision_problem_pl2": [
+    {"id": "d1_pl2", "type": "decision", "actions": ["r", "p", "s"],
+     "parent_edge": null, "parent_sequence": null}
+  ],
+  "utility_pl1": [
+    {"sequence_pl1": ["d1_pl1", "r"], "sequence_pl2": ["d1_pl2", "p"], "value": -1},
+    {"sequence_pl1": ["d1_pl1", "r"], "sequence_pl2": ["d1_pl2", "s"], "value": 1},
+    {"sequence_pl1": ["d1_pl1", "p"], "sequence_pl2": ["d1_pl2", "r"], "value": 1},
+    {"sequence_pl1": ["d1_pl1", "p"], "sequence_pl2": ["d1_pl2", "s"], "value": -2},
+    {"sequence_pl1": ["d1_pl1", "s"], "sequence_pl2": ["d1_pl2", "r"], "value": -1},
+    {"sequence_pl1": ["d1_pl1", "s"], "sequence_pl2": ["d1_pl2", "p"], "value": 2}
+  ]
+}
+\end{verbatim}}
+
+\subsection{Computing the value of the game (20 points)}
+
+As a warmup, you will implement the linear program formulation of Nash equilibrium strategies seen in Lecture~$10$ using the commercial solver Gurobi (\url{https://www.gurobi.com/}). Gurobi is a powerful commercial solver for linear and non-linear optimization problems. You can download the solver and request a free license for academic use from their website.
+
+\paragraph{Installing \texttt{gurobipy}}
+Installation instructions for Gurobi's python bindings are available on the Gurobi website, \href{https://www.gurobi.com/documentation/9.1/quickstart_linux/cs_python.html#section:Python}{here}.\footnote{\texttt{https://www.gurobi.com/documentation/9.1/quickstart\_linux/cs\_python.html\#section:Python}}
+
+\paragraph{Linear programming formulation of Nash equilibrium strategies}
+For your convenience, here are again the linear programs---for Player~$1$ and Player~$2$, respectively---that you need to implement:
+\begin{equation}\label{eq:nash lp}
+    \arraycolsep=1.0pt
+    \mathcal{P}_1 : \mleft\lbrace\begin{array}{l}
+        \displaystyle\max~ \vec{f}_2^\top \vec{v}\\[2mm]
+        \hspace{1mm}\text{\normalfont s.t.}~~ 
+        \arraycolsep=1.4pt
+        \begin{array}[t]{ll}
+            \circled{1}   & \mat{A}^\top \vec{x} - \mat{F}_2^\top \vec{v} \ge \vec{0} \\[1mm]
+            \circled{2}   & \mat{F}_1\vec{x}                      = \vec{f}_1 \\[1mm]
+            \circled{3}   & \vec{x} \ge \vec{0},~\vec{v}~\text{free},
+        \end{array} %\\
+    \end{array}\mright.
+    \hspace{2cm}
+    \mathcal{P}_2 : \mleft\lbrace\begin{array}{l}
+        \displaystyle\max~ \vec{f}_1^\top \vec{v}\\[2mm]
+        \hspace{1mm}\text{\normalfont s.t.}~~ 
+        \arraycolsep=1.4pt
+        \begin{array}[t]{ll}
+            \circled{1}   & -\mat{A} \vec{y} - \mat{F}_1^\top \vec{v} \ge \vec{0} \\[1mm]
+            \circled{2}   & \mat{F}_2\vec{y}                      = \vec{f}_2 \\[1mm]
+            \circled{3}   & \vec{y} \ge \vec{0},~\vec{v}~\text{free},
+        \end{array} %\\
+    \end{array}\mright.
+\end{equation}
+where $\{\vec{x}\in\bbR^{|\Sigma_1|}: \mat{F}_1 \vec{x} = \vec{f}_1, \vec{x}\ge\vec{0}\}$ and $\{\vec{y}\in\bbR^{|\Sigma_2|}: \mat{F}_2 \vec{y} = \vec{f}_2, \vec{y}\ge\vec{0}\}$ are the sequence-form polytopes of the two players, and $\mat{A}$ is the payoff matrix for Player~$1$. Conveniently, the objective values of $\mathcal{P}_1$ and $\mathcal{P}_2$ will be the exact expected utility that each player can secure by playing against a perfectly rational opponent. Since all games are zero sum, the objective values of $\mathcal{P}_1$ and $\mathcal{P}_2$ will sum to $0$ (if they don't, you must have a bug somewhere).
+
+
+\begin{problem}[20 points]\label{prob:unconstrained strat}
+    Implement the linear program for computing Nash equilibrium strategies for both Player~$1$ and Player~$2$.
+    
+    For each of the three games (rock-paper-superscissors, Kuhn poker, and Leduc poker), and for each of the two player, report Gurobi's output.  
+    \hint{make sure to take a look at the ``Gurobi tips and tricks'' at the end of this document. It includes some tips as to how to debug common issues.}
+    \hint{start from rock-paper-superscissors, and only then move to the more complex games.}
+    \hint{since all games are zero-sum, the objective values of $\mathcal{P}_1$ and $\mathcal{P}_2$ must sum to $0$.}
+    \hint{the objective value for $\mathcal{P}_1$ should be $0$ for rock-paper-superscissors, $-0.0555$ for Kuhn poker, and $-0.0856$ for Leduc poker.}
+\end{problem}
+\begin{solution}
+    \todo{Your solution here. You should include six Gurobi outputs (3 games, 2 players per game). Feel free to use the \texttt{verbatim} environment in Latex to simply dump the output. Make sure to specify what game and what player each Gurobi output refers to. Don't forget to include your code at the end of your homework. For example, your output in the case of rock-paper-superscissors for Player~$1$ should look roughly like this}
+    \color{violet}\begin{verbatim}
+Gurobi Optimizer version 9.1.1 build v9.1.1rc0 (linux64)
+Thread count: 8 physical cores, 16 logical processors, using up to 16 threads
+Optimize a model with 4 rows, 4 columns and 12 nonzeros
+Model fingerprint: 0x5264c0a3
+Coefficient statistics:
+    Matrix range     [1e+00, 2e+00]
+    Objective range  [1e+00, 1e+00]
+    Bounds range     [0e+00, 0e+00]
+    RHS range        [1e+00, 1e+00]
+Presolve removed 1 rows and 0 columns
+Presolve time: 0.01s
+Presolved: 3 rows, 4 columns, 11 nonzeros
+
+Iteration    Objective       Primal Inf.    Dual Inf.      Time
+        0    1.0000000e+00   1.000000e+00   0.000000e+00      0s
+        2   -0.0000000e+00   0.000000e+00   0.000000e+00      0s
+
+Solved in 2 iterations and 0.01 seconds
+Optimal objective -0.000000000e+00
+\end{verbatim}
+\end{solution}
+
+
+\subsection{Computing  optimal deterministic strategies (20 points)}
+
+In this subsection we study how much worse each player is if they (but not the opponent) are restricted to playing deterministic strategies only. To model this, we will add a constraint saying that all entries of the sequence-form strategy vectors $\vec{x}$ and $\vec{y}$ in~\eqref{eq:nash lp} can only take values in $\{0, 1\}$. The resulting \emph{integer} linear programs---which we call $\tilde{\mathcal{P}}_1$ and $\tilde{\mathcal{P}}_2$---are given next.
+\begin{equation}\label{eq:deterministic ilp}
+    \arraycolsep=1.0pt
+    \tilde{\mathcal{P}}_1 : \mleft\lbrace\begin{array}{l}
+        \displaystyle\max~ \vec{f}_2^\top \vec{v}\\[2mm]
+        \hspace{1mm}\text{\normalfont s.t.}~~ 
+        \arraycolsep=1.4pt
+        \begin{array}[t]{ll}
+            \circled{1}   & \mat{A}^\top \vec{x} - \mat{F}_2^\top \vec{v} \ge \vec{0} \\[1mm]
+            \circled{2}   & \mat{F}_1\vec{x}                      = \vec{f}_1 \\[1mm]
+            \circled{3}   & \vec{x} \in \{0,1\}^{|\Sigma_1|},~\vec{v}~\text{free},
+        \end{array} %\\
+    \end{array}\mright.
+    \hspace{2cm}
+    \tilde{\mathcal{P}}_2 : \mleft\lbrace\begin{array}{l}
+        \displaystyle\max~ \vec{f}_1^\top \vec{v}\\[2mm]
+        \hspace{1mm}\text{\normalfont s.t.}~~ 
+        \arraycolsep=1.4pt
+        \begin{array}[t]{ll}
+            \circled{1}   & -\mat{A} \vec{y} - \mat{F}_1^\top \vec{v} \ge \vec{0} \\[1mm]
+            \circled{2}   & \mat{F}_2\vec{y}                      = \vec{f}_2 \\[1mm]
+            \circled{3}   & \vec{y} \in \{0,1\}^{|\Sigma_2|},~\vec{v}~\text{free}.
+        \end{array} %\\
+    \end{array}\mright.
+\end{equation}
+
+\begin{problem}[20 points]\label{prob:deterministic strat}
+    Implement the integer linear programs given in~\eqref{eq:deterministic ilp} for computing optimal deterministic strategies for both Player~$1$ and Player~$2$. 
+    
+    For each of the three games (rock-paper-superscissors, Kuhn poker, and Leduc poker), and for each of the two player, report Gurobi's output. 
+    \hint{make sure to take a look at the ``Gurobi tips and tricks'' at the end of this document. It includes some tips as to how to debug common issues.}
+    \hint{start from rock-paper-superscissors, and only then move to the more complex games.}
+    \hint{here there are \emph{no guarantees} that the value of $\tilde{\mathcal{P}}_1$ and the value of $\tilde{\mathcal{P}}_2$ sum to $0$ anymore! In fact, that will be false in all games.}
+\end{problem}
+\begin{solution}
+    \todo{Your solution here. You should include six Gurobi outputs (3 games, 2 players per game). Feel free to use the \texttt{verbatim} environment in Latex to simply dump the output. Make sure to specify what game and what player each Gurobi output refers to. Don't forget to include your code at the end of your homework. For example, your output in the case of Kuhn poker for Player~$1$ should look roughly like this}
+    \color{violet}\begin{verbatim}
+Gurobi Optimizer version 9.1.1 build v9.1.1rc0 (linux64)
+Thread count: 8 physical cores, 16 logical processors, using up to 16 threads
+Optimize a model with 18 rows, 18 columns and 57 nonzeros
+Model fingerprint: 0x57532587
+Variable types: 6 continuous, 12 integer (12 binary)
+Coefficient statistics:
+    Matrix range     [2e-01, 1e+00]
+    Objective range  [1e+00, 1e+00]
+    Bounds range     [1e+00, 1e+00]
+    RHS range        [1e+00, 1e+00]
+Found heuristic solution: objective -0.3333335
+Presolve removed 11 rows and 10 columns
+Presolve time: 0.00s
+Presolved: 7 rows, 8 columns, 22 nonzeros
+Found heuristic solution: objective -0.3333333
+Variable types: 0 continuous, 8 integer (5 binary)
+
+Root relaxation: objective -5.555556e-02, 9 iterations, 0.00 seconds
+
+    Nodes    |    Current Node    |     Objective Bounds      |     Work
+ Expl Unexpl |  Obj  Depth IntInf | Incumbent    BestBd   Gap | It/Node Time
+
+     0     0   -0.05556    0    3   -0.33333   -0.05556  83.3%     -    0s
+H    0     0                      -0.1666667   -0.05556  66.7%     -    0s
+     0     0   -0.05556    0    3   -0.16667   -0.05556  66.7%     -    0s
+
+Explored 1 nodes (9 simplex iterations) in 0.00 seconds
+Thread count was 16 (of 16 available processors)
+
+Solution count 3: -0.166667 -0.333333 -0.333333
+No other solutions better than -0.166667
+
+Optimal solution found (tolerance 1.00e-04)
+Best objective -1.666666666667e-01, best bound -1.666666666667e-01, gap 0.0000%
+    \end{verbatim}
+\end{solution}
+
+
+\subsection{Controlling the amount of determinism (20 + 10 bonus points)}
+
+In \cref{prob:unconstrained strat} no determinism constraint was present. At the other extreme, in \cref{prob:deterministic strat} we insisted that at all decision points a deterministic strategy be followed. In this last subsection we will explore intermediate cases: for each value of $k$, we will study how much value each player can secure if they are constrained to play deterministically in at least $k$ decision points. When $k=0$, we will recover the objective values seen in \cref{prob:unconstrained strat}. When $k$ is equal to the number of decision points of the player in the game, we will recover the objective values seen in \cref{prob:deterministic strat}.
+
+\paragraph{Integer programming model} An optimal strategy for Player~$1$ subject to the constraint that at least $k$ decision points must prescribe a deterministic strategy can be obtained as the solution to the integer linear program $\mathcal{P}_1(k)$ given in~\eqref{eq:controlling ilp pl1}. Understanding the details is not important for this problem, though we included a description of the meaning of each constraint just in case you are curious. 
+
+\begin{equation}\label{eq:controlling ilp pl1}
+    \arraycolsep=1.0pt
+    \mathcal{P}_1(k) : \mleft\lbrace\begin{array}{l}
+        \displaystyle\max~ \vec{f}_2^\top \vec{v}\\[2mm]
+        \hspace{1mm}\text{\normalfont s.t.}~~ 
+        \arraycolsep=1.4pt
+        \begin{array}[t]{lll}
+            \circled{1}   & \mat{A}^\top \vec{x} - \mat{F}_2^\top \vec{v} \ge \vec{0} \\[1mm]
+            \circled{2}   & \mat{F}_1\vec{x}                      = \vec{f}_1 \\[2mm]
+            \circled{3}   & \vec{x}[ja] \ge \vec{z}[ja] & \forall j\in\cJ_1: p_j = \emptyseq,~~a\in A_j\\[4mm]
+            \circled{4}   & \vec{x}[ja] \ge \vec{x}[p_j] + \vec{z}[ja] - 1 & \forall j\in\cJ_1: p_j \neq \emptyseq,~~a\in A_j\\[4mm]
+            \circled{5}   & \displaystyle\sum_{a\in A_j} \vec{z}[ja] \le 1  & \forall\,j\in\cJ_1\\[4mm]
+            \circled{6}   & \displaystyle\sum_{j\in \cJ_1} \sum_{a\in A_j} \vec{z}[ja]\ge k\\[6mm]
+            \circled{7}   & \vec{x} \ge \vec{0},~\vec{z}\in\{0,1\}^{|\Sigma_1|},~\vec{v}~\text{free},
+        \end{array} %\\
+    \end{array}\mright.
+\end{equation}
+\begin{itemize}
+    \item $\vec{z} \in \{0,1\}^{|\Sigma_1|}$ is a binary vector that decides, for each strategy $ja \in \Sigma_1$ of Player~$1$, whether to pick action $a$ at $j$ with probability $1$. Since the strategy vector $\vec{x}$ is expressed in sequence-form, picking action $a$ with probability $1$ at $j$ is expressed through constraints \circled{3} and \circled{4}.
+    \item Constraint \circled{5} asserts that no more than one action at each decision point can be forced to be played with probability $1$.
+    \item Constraint \circled{6} asserts that in at least $k$ decision point, exactly one of the actions will be forced to be played with probability $1$.
+\end{itemize}
+
+The integer linear program $\mathcal{P}_2(k)$ for Player~$2$ is analogous.
+
+\begin{problem}[20 points]
+    Implement the integer linear programs $\mathcal{P}_1(k)$ and $\mathcal{P}_2(k)$, described above, for computing optimal strategies with a given lower bound on the amount of determinism. 
+
+    For each of the three games (rock-paper-superscissors, Kuhn poker, and Leduc poker), and for each of the two player $i$, plot the objective value of $\mathcal{P}_i(k)$ as a function of $k \in \{0, \dots, |\cJ_i|\}$ (number of decision points of Player~$i$).
+    \hint{make sure to take a look at the ``Gurobi tips and tricks'' at the end of this document. It includes some tips as to how to debug common issues.}
+    \hint{Gurobi can be pretty verbose by default. For this problem, if you would like to silence Gurobi you can use \texttt{m.setParam("OutputFlag", 0)}}
+    \hint{For Leduc poker, if Gurobi is taking too long to optimize when $k$ is large, you can lower the solution precision by calling \texttt{m.setParam("MIPGap", 0.01)} before \texttt{m.optimize()}. Expect a runtime of up to one-five hours for Leduc poker, depending on how powerful the machine you are using is.}
+\end{problem}
+\begin{solution}
+    \todo{Your solution here. You should include six plots (3 games, 2 players per game). Make sure to specify what game and what player each plot refers to. Don't forget to include your code at the end of your homework.}
+\end{solution}
+
+\begin{problem}[10 bonus points]
+    Comment on the results you obtained in this problem: do highly-deterministic strategies for the three small games exist? Are the results what you expected? If yes, what did he results confirm? If not, how do you think you can reconcile your previous intuition with the experimental findings?
+\end{problem}
+\begin{solution}
+    \todo{Your solution here}
+\end{solution}
+
+\appendix
+\section{Appendix: Gurobi tips and tricks}
+
+\paragraph{Basic notation}
+Let \texttt{m} denote the Gurobi model object. Then, here is a quick cookbook.
+\begin{itemize}
+    \item Add a continuous free variable:\newline\verb|m.addVar(-GRB.INFINITY, GRB.INFINITY, vtype=GRB.CONTINUOUS, name="human_var_name_here")|
+    \item Add a continuous nonnegative variable:\newline\verb|m.addVar(0.0, GRB.INFINITY, vtype=GRB.CONTINUOUS, name="human_var_name_here")|
+    \item Add a binary variable:\newline\verb|m.addVar(0.0, 1.0, vtype=GRB.BINARY, name="human_var_name_here")|
+    \item Add an equality constraint:\newline\verb|m.addConstr(lhs == rhs)|
+    \item Add an inequality $(\ge)$ constraint:\newline\verb|m.addConstr(lhs >= rhs)|
+    \item Set a maximization objective:\newline\verb|m.setObjective(obj, sense=GRB.MAXIMIZE)|
+\end{itemize}
+
+\paragraph{Accessing the solution} After calling \verb|m.optimize()|, you can obtain the objective value by calling
+\begin{verbatim}
+    m.getAttr(GRB.Attr.ObjVal)
+\end{verbatim}
+
+If you want to inspect the solution, given a variable object \texttt{v} (the object returned by \texttt{m.addVar}), you can access the value of \texttt{v} in the current solution by calling
+\begin{verbatim}
+    v.getAttr(GRB.Attr.X)
+\end{verbatim}
+
+\paragraph{Troubleshooting} First of all, if you are having a problem with Gurobi, the first thing you should try to do is to ask Gurobi to dump the model that it thinks you are asking to solve to a file in a human readable format. \emph{Reading the model file will be so much easier if you gave names to the variables in your model, using the `\texttt{name}' optional argument of \texttt{addVar}.}
+
+To have Gurobi dump the model, you can use something like this:
+\begin{verbatim}
+    m.write("/tmp/model.lp")
+\end{verbatim}
+Of course, you can specify a different path. However, it is important that you keep the `\texttt{.lp}' extension: there are multiple format that Gurobi can output, and it uses the file extension to guess which format you want.
+
+Beyond the general rule of thumb above, make sure of the following:
+\begin{itemize}
+    \item Start from rock-paper-superscissors. There, the \verb|/tmp/model.lp| file for Player 1 for \cref{prob:unconstrained strat} should look something like this (probably with different variable names):
+\begin{verbatim}
+\ Model game_value_pl1
+\ LP format - for model browsing. Use MPS format to capture full model detail.
+Maximize
+    v[d1_pl2]
+Subject To
+    R0: x[('d1_pl1',_'p')] - x[('d1_pl1',_'s')] - v[d1_pl2] >= 0
+    R1: - x[('d1_pl1',_'r')] + 2 x[('d1_pl1',_'s')] - v[d1_pl2] >= 0
+    R2: x[('d1_pl1',_'r')] - 2 x[('d1_pl1',_'p')] - v[d1_pl2] >= 0
+    R3: x[('d1_pl1',_'r')] + x[('d1_pl1',_'p')] + x[('d1_pl1',_'s')] = 1
+Bounds
+    v[d1_pl2] free
+End    
+\end{verbatim}
+    \emph{Note:} Gurobi omits listing nonnegative variables in the \verb|Bounds| section.
+    \item Did you remember to specify that you want a \emph{maximization} problem? (Gurobi's default is minimization) If Gurobi says that the model is unbounded, chances are you forgot.
+    \item Check that the number of variables and constraints is what you expect. Are the sense of the constraints (equality, $\le$, $\ge$) what you wanted?
+\end{itemize}
+
+\bibliographystyle{unsrtnat}
+\bibliography{references}
+
+\end{document}

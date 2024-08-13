@@ -1,0 +1,111 @@
+\ProvidesPackage{gabri_notation}
+
+\tikzset {
+    pl1/.style={%
+        semithick,fill=black,draw=black,circle,inner sep=.55mm,
+        append after command={
+            \pgfextra{
+            \begin{pgfinterruptpath}
+                \draw[gray] (\tikzlastnode.center) circle (.2);
+            \end{pgfinterruptpath}
+        }}
+    },
+    pl2/.style={%
+        semithick,fill=white,draw=black,circle,inner sep=.58mm,
+        append after command={
+            \pgfextra{
+            \begin{pgfinterruptpath}
+                \draw[gray] (\tikzlastnode.center) circle (.2);
+            \end{pgfinterruptpath}
+        }}
+    },
+    showdown/.style={%
+        draw=black,inner sep=.9mm,
+        append after command={
+            \pgfextra{
+            \begin{pgfinterruptpath}
+                \draw[fill=black] ($(\tikzlastnode.center) - (.25mm,.25mm)$) rectangle +(.5mm,.5mm);
+            \end{pgfinterruptpath}
+        }}
+    },
+    fold/.style={%
+        draw=black,inner sep=.9mm
+    }
+}
+
+% \newcommand{\observationpoint}{$\otimes$}
+\newcommand{\terminalnode}{\bot}
+\newcommand{\infos}[1]{\cJ_{#1}}
+\newcommand{\parseq}[1]{p_{#1}}
+\newcommand{\cC}{\ensuremath{\mathcal{C}}}
+\newcommand{\children}[1]{\cC_{#1}}
+\newcommand{\dbar}[1]{\bar{\bar{#1}}}
+
+
+\usetikzlibrary{
+    calc,
+    arrows,
+    arrows.meta,
+    shapes.misc,
+    shapes.geometric,
+    patterns,
+    decorations.pathreplacing,
+    calligraphy
+}
+\usepackage{pgfcalendar}
+\usepackage[object=vectorian]{pgfornament}
+
+\tikzset{cross/.style={path picture={
+  \draw[black]
+(path picture bounding box.south east) -- (path picture bounding box.north west) (path picture bounding box.south west) -- (path picture bounding box.north east);
+}}}
+\tikzstyle{chanode}=[fill=white,draw=black,circle,cross,inner sep=.8mm]
+\tikzstyle{pl1node}=[fill=black,draw=black,circle,inner sep=.5mm]
+\tikzstyle{pl2node}=[fill=white,draw=black,circle,inner sep=.55mm]
+\tikzstyle{termina}=[fill=white,draw=black,inner sep=.6mm]
+\tikzstyle{decpt}  =[fill=black,draw=black,inner sep=.8mm]
+\tikzstyle{obspt}  =[fill=white,draw=black,cross,inner sep=0.95mm]
+
+\newcommand{\colorrule}[1]{%
+    \arrayrulecolor{#1}\midrule\arrayrulecolor{black}%
+}
+
+\newcommand{\todo}[1]{\textcolor{red}{[*** #1 ***]}}
+\renewcommand{\vec}[1]{\bm{#1}}
+\newcommand{\kro}{\otimes}
+\newcommand{\bbP}{\mathbb{P}}
+\newcommand{\bbR}{\mathbb{R}}
+\newcommand{\cR}{\mathcal{R}}
+\newcommand{\rmp}{RM$^+$}
+\DeclareMathOperator{\co}{co}
+\DeclareMathOperator{\relint}{relint}
+\newcommand{\symp}[1]{\Delta^{#1}}
+
+\newcommand{\defeq}{\ensuremath{\coloneqq}}
+\newcommand{\seq}[1]{\textsf{#1}}
+\newcommand{\bbN}{\ensuremath{\mathbb{N}}}
+\newcommand{\bbE}{\mathbb{E}}
+\newcommand{\cL}{\ensuremath{\mathcal{L}}}
+\newcommand{\mat}[1]{\ensuremath{\mathbf{#1}}}
+\newcommand\xldots{\makebox[1em][c]{.\hfil.\hfil.}}
+\newcommand{\cM}{\ensuremath{\mathcal{M}}}
+\newcommand{\Q}{\ensuremath{\mathcal{Q}}}
+\newcommand{\cJ}{\ensuremath{\mathcal{J}}}
+\newcommand{\cK}{\ensuremath{\mathcal{K}}}
+\newcommand{\cX}{\mathcal{X}}
+\newcommand{\cY}{\mathcal{Y}}
+\newcommand{\xhat}{\hat{\vec{x}}}
+\newcommand{\yhat}{\hat{\vec{y}}}
+\newcommand{\zhat}{\hat{\vec{z}}}
+\newcommand{\range}[1]{\ensuremath{[\![#1]\!]}} 
+\DeclareMathOperator*{\argmin}{arg\,min}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator{\cone}{cone}
+\newcommand{\emptyseq}{\varnothing}
+\renewcommand{\div}[2]{D_\varphi(#1 \,\|\, #2)}
+
+\newcommand{\vsfp}{von Stengel-Forges polytope}
+\newcommand{\vsfc}{von Stengel-Forges constraint}
+\DeclareMathOperator{\Span}{span}
+
+\newcommand{\seqf}{Q}
