@@ -95,7 +95,7 @@ def solve_problem_3_2(game):
     plt.xlabel('Time (t)', fontsize=10)
     plt.ylabel('Value', fontsize=10)
 
-    plt.savefig(f'prob3.2_{args.game[:-5]}.png')
+    plt.savefig(f'hw_plots/prob3.2_{args.game[:-5]}.png')
     plt.show()
 
 
@@ -150,7 +150,7 @@ def solve_problem_3_3(game):
     plt.xlabel('Time (t)', fontsize=10)
     plt.ylabel('Value', fontsize=10)
 
-    plt.savefig(f'prob3.3_{args.game[:-5]}.png')
+    plt.savefig(f'hw_plots/prob3.3_{args.game[:-5]}.png')
     plt.show()
 
 
