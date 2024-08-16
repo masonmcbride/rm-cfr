@@ -1,36 +1,58 @@
 #!/usr/bin/env python3
 
+import sys
 import os
 import argparse
 import json
 import gurobipy as gurobi
 from gurobipy import GRB
 
+from pprint import pprint
+def LP_realization_matrices(tfsdp) -> tuple:
+    """Construct the realization matrices needed for LP solving
+    F: The reach_probaility and total constraints probality due to tree structure
+    f: Constraint that assures that root reach probability is 1.  
+    """
+    J = [node for node in tfsdp if node['type'] == 'decision'] 
+    sequence_list = [(n['id'],a) for n in J for a in n['actions']]
+
+    # initialize the root realization row
+    F = [{**{sequence: 0 for sequence in sequence_list}, None: 1}]
+    
+    # build the realization matrix for each infoset
+    for infoset in J:
+        F.append({
+            **{sequence: 0 for sequence in sequence_list},
+            None: 0,
+            infoset['parent_sequence']: -1,
+            **{(infoset['id'],a): 1 for a in infoset['actions']}
+        })
+
+    f = [1] + [0] * len(J)
+
+    return (F, f)
+
+def to_ndarray(tfsdp, F: list[dict]):
+    J = [node for node in tfsdp if node['type'] == 'decision'] 
+    sequence_list = [(n['id'],a) for n in J for a in n['actions']]
+    sequence_map = dict([(None,0)]+list(zip(sequence_list,range(1,len(sequence_list)+1))))
+    for row in F:
+        out = [0] * len(row)
+        for sequence,val in row.items():
+            out[sequence_map[sequence]] = val
+        print(out)
 
 def solve_problem_2_1(game):
-    A = build_payoff_matrix()
-    F1, F2, f1, f2 = build_realization_weights()
+    tfsdp1, tfsdp2 = game['decision_problem_pl1'], game['decision_problem_pl2']
+    tfsdp = {1: tfsdp1, 2: tfsdp2}
+    F1, f1 = LP_realization_matrices(tfsdp1)
+    F2, f2 = LP_realization_matrices(tfsdp2)
+    pprint(F1)
+    pprint(F2)
 
+    # first output what the F and f matrix might look like 
     for player in [1, 2]:
-
-        # create model
-        m = gurobi.Model("game_value_pl" + str(player))
-        
-        # create variables
-        x = m.addMVar(3, lb=None, up=1.0, name="strategy_vec")
-        v = m.addMVar(1, name="value_vec")
-
-        # create objective
-        m.setObjective(v, GRB.MAXIMIZE)
-
-        # add constraints
-        m.addConstr(A @ x - F1 @ v >= 0)
-        m.addConstr(F1 @ x == f1)
-        # To debug your implementation, you might find it useful to ask
-        # Gurobi to output the current model it thinks you are asking it
-        # to optimize.
-
-        m.optimize()
+        pass
 
 
 def solve_problem_2_2(game):
@@ -46,7 +68,6 @@ def solve_problem_2_2(game):
 
         m.optimize()
 
-
 def solve_problem_2_3(game):
     for player in [1, 2]:
         # FINISH
@@ -55,7 +76,6 @@ def solve_problem_2_3(game):
         # Gurobi to output the current model it thinks you are asking it
         # to optimize.
         raise NotImplementedError
-
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
