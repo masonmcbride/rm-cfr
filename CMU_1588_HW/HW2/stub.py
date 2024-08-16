@@ -7,6 +7,10 @@ import json
 import gurobipy as gurobi
 from gurobipy import GRB
 
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../')))
+from rm_cfr import *
+import numpy as np
+
 from pprint import pprint
 def LP_realization_matrices(tfsdp) -> tuple:
     """Construct the realization matrices needed for LP solving
@@ -32,32 +36,53 @@ def LP_realization_matrices(tfsdp) -> tuple:
 
     return (F, f)
 
+def LP_sequence_set(tfsdp) -> set:
+    return get_sequence_set(tfsdp).union({None})
+
+def LP_uniform_strategy(tfsdp) -> dict:
+    uniform = uniform_sf_strategy(tfsdp)
+    uniform[None] = 1
+    return uniform
+
 def to_ndarray(tfsdp, F: list[dict]):
     J = [node for node in tfsdp if node['type'] == 'decision'] 
     sequence_list = [(n['id'],a) for n in J for a in n['actions']]
     sequence_map = dict([(None,0)]+list(zip(sequence_list,range(1,len(sequence_list)+1))))
+    ret = [] 
+    print(sequence_map)
     for row in F:
         out = [0] * len(row)
         for sequence,val in row.items():
             out[sequence_map[sequence]] = val
-        print(out)
+        ret.append(out)
+    return np.array(ret)
 
 def solve_problem_2_1(game):
     tfsdp1, tfsdp2 = game['decision_problem_pl1'], game['decision_problem_pl2']
     tfsdp = {1: tfsdp1, 2: tfsdp2}
-    F1, f1 = LP_realization_matrices(tfsdp1)
-    F2, f2 = LP_realization_matrices(tfsdp2)
-    pprint(F1)
-    pprint(F2)
+    F1_dict, f1 = LP_realization_matrices(tfsdp1)
+    F2_dict, f2 = LP_realization_matrices(tfsdp2)
+    x_dict = LP_uniform_strategy(tfsdp1)
+    F1 = to_ndarray(tfsdp1,F1_dict)
+    print(F1)
+    x = to_ndarray(tfsdp1, [x_dict]).T
+    print(x)
+    out = [sum(row[sequence] * x_dict[sequence] for sequence in LP_sequence_set(tfsdp1)) for row in F1_dict]
+    print(out)
+    print(f"{F1.shape=}")
+    print(f"{x.shape=}")
+    print(F1@x)
 
     # first output what the F and f matrix might look like 
     for player in [1, 2]:
-        pass
+        m = gurobi.Model(f"Nash Equilibrium for {player=}")
+
+
 
 
 def solve_problem_2_2(game):
     for player in [1, 2]:
-        m = gurobi.Model("deterministic_pl" + str(player))
+        m = gurobi.Model(f"deterministic_pl{player}")
 
         # FINISH
         #
