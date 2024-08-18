@@ -1,0 +1,58 @@
+python hw2.py --game kuhn_poker.json --problem 2.1
+Reading game path kuhn_poker.json...
+... done. Running code for Problem 2.1
+A.shape=(13, 13)
+F1.shape=(7, 13)
+f1.shape=(1, 7)
+F2.shape=(7, 13)
+f2.shape=(1, 7)
+Restricted license - for non-production use only - expires 2025-11-24
+x.shape=(13,)
+v1.shape=(7,)
+Gurobi Optimizer version 11.0.3 build v11.0.3rc0 (linux64 - "Ubuntu 22.04.4 LTS")
+
+CPU model: 12th Gen Intel(R) Core(TM) i7-12700K, instruction set [SSE2|AVX|AVX2]
+Thread count: 10 physical cores, 20 logical processors, using up to 20 threads
+
+Optimize a model with 20 rows, 20 columns and 68 nonzeros
+Model fingerprint: 0xa47728b4
+Coefficient statistics:
+  Matrix range     [2e-01, 1e+00]
+  Objective range  [1e+00, 1e+00]
+  Bounds range     [1e+00, 1e+01]
+  RHS range        [1e+00, 1e+00]
+Presolve removed 4 rows and 4 columns
+Presolve time: 0.00s
+Presolved: 16 rows, 16 columns, 58 nonzeros
+
+Iteration    Objective       Primal Inf.    Dual Inf.      Time
+       0    1.0051667e+00   1.012000e+00   0.000000e+00      0s
+      12   -5.5555556e-02   0.000000e+00   0.000000e+00      0s
+
+Solved in 12 iterations and 0.00 seconds (0.00 work units)
+Optimal objective -5.555555556e-02
+y.shape=(13,)
+v2.shape=(7,)
+Gurobi Optimizer version 11.0.3 build v11.0.3rc0 (linux64 - "Ubuntu 22.04.4 LTS")
+
+CPU model: 12th Gen Intel(R) Core(TM) i7-12700K, instruction set [SSE2|AVX|AVX2]
+Thread count: 10 physical cores, 20 logical processors, using up to 20 threads
+
+Optimize a model with 20 rows, 20 columns and 68 nonzeros
+Model fingerprint: 0xbdaa983a
+Coefficient statistics:
+  Matrix range     [2e-01, 1e+00]
+  Objective range  [1e+00, 1e+00]
+  Bounds range     [1e+00, 1e+01]
+  RHS range        [1e+00, 1e+00]
+Presolve removed 9 rows and 10 columns
+Presolve time: 0.00s
+Presolved: 11 rows, 10 columns, 34 nonzeros
+
+Iteration    Objective       Primal Inf.    Dual Inf.      Time
+       0    3.3533333e-01   5.336333e+00   0.000000e+00      0s
+       8    5.5555556e-02   0.000000e+00   0.000000e+00      0s
+
+Solved in 8 iterations and 0.00 seconds (0.00 work units)
+Optimal objective  5.555555556e-02
+0.0

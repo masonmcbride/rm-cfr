@@ -1,0 +1,58 @@
+python hw2.py --game leduc_poker.json --problem 2.1
+Reading game path leduc_poker.json...
+... done. Running code for Problem 2.1
+A.shape=(337, 337)
+F1.shape=(145, 337)
+f1.shape=(1, 145)
+F2.shape=(145, 337)
+f2.shape=(1, 145)
+Restricted license - for non-production use only - expires 2025-11-24
+x.shape=(337,)
+v1.shape=(145,)
+Gurobi Optimizer version 11.0.3 build v11.0.3rc0 (linux64 - "Ubuntu 22.04.4 LTS")
+
+CPU model: 12th Gen Intel(R) Core(TM) i7-12700K, instruction set [SSE2|AVX|AVX2]
+Thread count: 10 physical cores, 20 logical processors, using up to 20 threads
+
+Optimize a model with 482 rows, 482 columns and 1928 nonzeros
+Model fingerprint: 0x891c9936
+Coefficient statistics:
+  Matrix range     [3e-02, 1e+00]
+  Objective range  [1e+00, 1e+00]
+  Bounds range     [1e+00, 1e+01]
+  RHS range        [1e+00, 1e+00]
+Presolve removed 112 rows and 112 columns
+Presolve time: 0.00s
+Presolved: 370 rows, 370 columns, 2176 nonzeros
+
+Iteration    Objective       Primal Inf.    Dual Inf.      Time
+       0    1.1632112e+01   3.820920e+02   0.000000e+00      0s
+     457   -8.5606424e-02   0.000000e+00   0.000000e+00      0s
+
+Solved in 457 iterations and 0.01 seconds (0.01 work units)
+Optimal objective -8.560642408e-02
+y.shape=(337,)
+v2.shape=(145,)
+Gurobi Optimizer version 11.0.3 build v11.0.3rc0 (linux64 - "Ubuntu 22.04.4 LTS")
+
+CPU model: 12th Gen Intel(R) Core(TM) i7-12700K, instruction set [SSE2|AVX|AVX2]
+Thread count: 10 physical cores, 20 logical processors, using up to 20 threads
+
+Optimize a model with 482 rows, 482 columns and 1928 nonzeros
+Model fingerprint: 0x754ddd2c
+Coefficient statistics:
+  Matrix range     [3e-02, 1e+00]
+  Objective range  [1e+00, 1e+00]
+  Bounds range     [1e+00, 1e+01]
+  RHS range        [1e+00, 1e+00]
+Presolve removed 73 rows and 73 columns
+Presolve time: 0.00s
+Presolved: 409 rows, 409 columns, 2065 nonzeros
+
+Iteration    Objective       Primal Inf.    Dual Inf.      Time
+       0    1.2000600e+02   6.269250e+02   0.000000e+00      0s
+     425    8.5606424e-02   0.000000e+00   0.000000e+00      0s
+
+Solved in 425 iterations and 0.01 seconds (0.01 work units)
+Optimal objective  8.560642408e-02
+1.7763568394002505e-15

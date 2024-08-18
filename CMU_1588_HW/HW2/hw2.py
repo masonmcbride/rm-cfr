@@ -26,16 +26,11 @@ def build_payoff_matrix(game):
 
     rows = {sequence_pl2: {sequence_pl1: 0 for sequence_pl1 in sequence_list_pl1} 
             for sequence_pl2 in sequence_list_pl2} 
-    A = [] 
     for leaf_node in game['utility_pl1']:
         row = rows[leaf_node['sequence_pl2']]
         row[leaf_node['sequence_pl1']] = leaf_node['value']
-    for seq in sequence_list_pl2:
-        print(seq)
-        print(rows[seq].values())
-    A = [list(row.values()) for row in sequence_list_pl2]
-    pprint(f"{A}")
-    return rows
+    A = [list(rows[seq].values()) for seq in sequence_list_pl2] 
+    return np.array(A)
 
 def LP_realization_matrices(tfsdp) -> tuple:
     """Construct the realization matrices needed for LP solving
@@ -82,52 +77,59 @@ def to_ndarrays(tfsdp, F_dict: list[dict], f_dict):
     return np.array(F), np.array(f)
 
 def solve_problem_2_1(game):
-    A = build_payoff_matrix(game)
     tfsdp1, tfsdp2 = game['decision_problem_pl1'], game['decision_problem_pl2']
-    tfsdp = {1: tfsdp1, 2: tfsdp2}
+    A = build_payoff_matrix(game)
     F1_dict, f1_dict = LP_realization_matrices(tfsdp1)
     F2_dict, f2_dict = LP_realization_matrices(tfsdp2)
     F1, f1 = to_ndarrays(tfsdp1,F1_dict,f1_dict)
     F2, f2 = to_ndarrays(tfsdp2,F2_dict,f2_dict)
+    infosets_pl1 = [node for node in tfsdp1 if node['type'] == 'decision']
+    infosets_pl2 = [node for node in tfsdp2 if node['type'] == 'decision']
+    print(f"{A.shape=}")
     print(f"{F1.shape=}")
     print(f"{f1.shape=}")
     print(f"{F2.shape=}")
     print(f"{f2.shape=}")
 
-    # first output what the F and f matrix might look like 
-    for player in [1, 2]:
-        J = [node for node in tfsdp[player] if node['type'] == 'decision'] 
+    #### PLayer 1 LP ####
+    m1 = gurobi.Model("Nash Equilbrium for player 1")
 
-        # initialize model
-        m = gurobi.Model(f"Nash Equilibrium for {player=}")
+    # define variables
+    x = m1.addMVar(shape=len(LP_sequence_set(tfsdp1)), lb=0.0, ub=1.0, name='x')
+    print(f"{x.shape=}")
+    v1 = m1.addMVar(shape=len(infosets_pl1)+1, lb=-10, ub=10, name='v1')
+    print(f"{v1.shape=}")
 
-        # define variables
-        x = m.addMVar(shape=len(LP_sequence_set(tfsdp[player])), lb=0.0, name='x')
-        print(f"{x.shape=}")
-        v = m.addMVar(shape=len(J)+1, name='v')
-        print(f"{v.shape=}")
-        print(f"state before opt {m.status}")
+    # set objective
+    m1.setObjective(f2@v1,GRB.MAXIMIZE)
 
-        # set objective
-        #m.setObjective(f2@v)
+    # add constraints
+    m1.addConstr(A@x - F2.T@v1 >= 0)
+    m1.addConstr(F1@x == f1)
 
-        # add constraints
+    # optimize and output
+    m1.optimize()
 
-        # optimize and output
-        #m.optimize()
-        print(f"status now {m.status}")
-        if m.status == GRB.OPTIMAL:
-            print("Optimal objective value:", m.objVal)
-            print("Optimal strategy x:", x.X)
-            print("Optimal variable v:", v.X)
-        else:
-            print("Optimization was not successful.")
-        
-        # flip the payoff matrix for player 2
-        A = -A.T
+    #### PLayer 2 LP ####
+    m2 = gurobi.Model("Nash Equilbrium for player 2")
 
+    # define variables
+    y = m2.addMVar(shape=len(LP_sequence_set(tfsdp2)), lb=0.0, ub=1.0, name='y')
+    print(f"{y.shape=}")
+    v2 = m2.addMVar(shape=len(infosets_pl2)+1, lb=-10, ub=10, name='v2')
+    print(f"{v2.shape=}")
 
+    # set objective
+    m2.setObjective(f1@v2,GRB.MAXIMIZE)
 
+    # add constraints
+    m2.addConstr(-A.T@y - F1.T@v2 >= 0)
+    m2.addConstr(F2@y == f2)
+
+    # optimize and output
+    m2.optimize()
+
+    print(f"The sum of both objective values should be 0.\nResult: {m1.objVal + m2.objVal}")
 
 def solve_problem_2_2(game):
     for player in [1, 2]:
