@@ -12,6 +12,31 @@ from rm_cfr import *
 import numpy as np
 
 from pprint import pprint
+
+def build_payoff_matrix(game):
+    """contruct the payoff matrix from the json provided in the game variable
+    turn the sequence form payoff entries into payoff matrix wrt player 1
+    since it zero sum the payoff matrix for player 2 is -A
+    """
+    infoset_pl1 = [n for n in game['decision_problem_pl1'] if n['type'] == 'decision'] 
+    sequence_list_pl1 = [None] + [(n['id'],a) for n in infoset_pl1 for a in n['actions']]
+
+    infoset_pl2 = [n for n in game['decision_problem_pl2'] if n['type'] == 'decision']
+    sequence_list_pl2 = [None] + [(n['id'],a) for n in infoset_pl2 for a in n['actions']]
+
+    rows = {sequence_pl2: {sequence_pl1: 0 for sequence_pl1 in sequence_list_pl1} 
+            for sequence_pl2 in sequence_list_pl2} 
+    A = [] 
+    for leaf_node in game['utility_pl1']:
+        row = rows[leaf_node['sequence_pl2']]
+        row[leaf_node['sequence_pl1']] = leaf_node['value']
+    for seq in sequence_list_pl2:
+        print(seq)
+        print(rows[seq].values())
+    A = [list(row.values()) for row in sequence_list_pl2]
+    pprint(f"{A}")
+    return rows
+
 def LP_realization_matrices(tfsdp) -> tuple:
     """Construct the realization matrices needed for LP solving
     F: The reach_probaility and total constraints probality due to tree structure
@@ -21,7 +46,7 @@ def LP_realization_matrices(tfsdp) -> tuple:
     sequence_list = [(n['id'],a) for n in J for a in n['actions']]
 
     # initialize the root realization row
-    F = [{**{sequence: 0 for sequence in sequence_list}, None: 1}]
+    F = [{None: 1, **{sequence: 0 for sequence in sequence_list}}]
     
     # build the realization matrix for each infoset
     for infoset in J:
@@ -32,50 +57,74 @@ def LP_realization_matrices(tfsdp) -> tuple:
             **{(infoset['id'],a): 1 for a in infoset['actions']}
         })
 
-    f = [1] + [0] * len(J)
+    f = [{None: 1, **{infoset['id']: 0 for infoset in J}}]
 
     return (F, f)
 
 def LP_sequence_set(tfsdp) -> set:
+    """return sequence set with empty sequuence for LP conditions"""
     return get_sequence_set(tfsdp).union({None})
 
 def LP_uniform_strategy(tfsdp) -> dict:
+    """return uniform strategy for LP (including the empty sequence with 1 probability)"""
     uniform = uniform_sf_strategy(tfsdp)
     uniform[None] = 1
     return uniform
 
-def to_ndarray(tfsdp, F: list[dict]):
-    J = [node for node in tfsdp if node['type'] == 'decision'] 
-    sequence_list = [(n['id'],a) for n in J for a in n['actions']]
-    sequence_map = dict([(None,0)]+list(zip(sequence_list,range(1,len(sequence_list)+1))))
-    ret = [] 
-    print(sequence_map)
-    for row in F:
-        out = [0] * len(row)
-        for sequence,val in row.items():
-            out[sequence_map[sequence]] = val
-        ret.append(out)
-    return np.array(ret)
+def to_ndarrays(tfsdp, F_dict: list[dict], f_dict):
+    """Turns the dic"""
+    infosets = [node for node in tfsdp if node['type'] == 'decision'] 
+    sequence_list = [None] + [(n['id'],a) for n in infosets for a in n['actions']]
+
+    F = [[row[sequence] for sequence in sequence_list] for row in F_dict]
+    f = [[1] + [0] * len(infosets)]
+
+    return np.array(F), np.array(f)
 
 def solve_problem_2_1(game):
+    A = build_payoff_matrix(game)
     tfsdp1, tfsdp2 = game['decision_problem_pl1'], game['decision_problem_pl2']
     tfsdp = {1: tfsdp1, 2: tfsdp2}
-    F1_dict, f1 = LP_realization_matrices(tfsdp1)
-    F2_dict, f2 = LP_realization_matrices(tfsdp2)
-    x_dict = LP_uniform_strategy(tfsdp1)
-    F1 = to_ndarray(tfsdp1,F1_dict)
-    print(F1)
-    x = to_ndarray(tfsdp1, [x_dict]).T
-    print(x)
-    out = [sum(row[sequence] * x_dict[sequence] for sequence in LP_sequence_set(tfsdp1)) for row in F1_dict]
-    print(out)
+    F1_dict, f1_dict = LP_realization_matrices(tfsdp1)
+    F2_dict, f2_dict = LP_realization_matrices(tfsdp2)
+    F1, f1 = to_ndarrays(tfsdp1,F1_dict,f1_dict)
+    F2, f2 = to_ndarrays(tfsdp2,F2_dict,f2_dict)
     print(f"{F1.shape=}")
-    print(f"{x.shape=}")
-    print(F1@x)
+    print(f"{f1.shape=}")
+    print(f"{F2.shape=}")
+    print(f"{f2.shape=}")
 
     # first output what the F and f matrix might look like 
     for player in [1, 2]:
+        J = [node for node in tfsdp[player] if node['type'] == 'decision'] 
+
+        # initialize model
         m = gurobi.Model(f"Nash Equilibrium for {player=}")
+
+        # define variables
+        x = m.addMVar(shape=len(LP_sequence_set(tfsdp[player])), lb=0.0, name='x')
+        print(f"{x.shape=}")
+        v = m.addMVar(shape=len(J)+1, name='v')
+        print(f"{v.shape=}")
+        print(f"state before opt {m.status}")
+
+        # set objective
+        #m.setObjective(f2@v)
+
+        # add constraints
+
+        # optimize and output
+        #m.optimize()
+        print(f"status now {m.status}")
+        if m.status == GRB.OPTIMAL:
+            print("Optimal objective value:", m.objVal)
+            print("Optimal strategy x:", x.X)
+            print("Optimal variable v:", v.X)
+        else:
+            print("Optimization was not successful.")
+        
+        # flip the payoff matrix for player 2
+        A = -A.T
 
 
 
