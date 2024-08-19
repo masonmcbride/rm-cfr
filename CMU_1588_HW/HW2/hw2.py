@@ -132,26 +132,139 @@ def solve_problem_2_1(game):
     print(f"The sum of both objective values should be 0.\nResult: {m1.objVal + m2.objVal}")
 
 def solve_problem_2_2(game):
-    for player in [1, 2]:
-        m = gurobi.Model(f"deterministic_pl{player}")
+    tfsdp1, tfsdp2 = game['decision_problem_pl1'], game['decision_problem_pl2']
+    A = build_payoff_matrix(game)
+    F1_dict, f1_dict = LP_realization_matrices(tfsdp1)
+    F2_dict, f2_dict = LP_realization_matrices(tfsdp2)
+    F1, f1 = to_ndarrays(tfsdp1,F1_dict,f1_dict)
+    F2, f2 = to_ndarrays(tfsdp2,F2_dict,f2_dict)
+    infosets_pl1 = [node for node in tfsdp1 if node['type'] == 'decision']
+    infosets_pl2 = [node for node in tfsdp2 if node['type'] == 'decision']
+    print(f"{A.shape=}")
+    print(f"{F1.shape=}")
+    print(f"{f1.shape=}")
+    print(f"{F2.shape=}")
+    print(f"{f2.shape=}")
 
-        # FINISH
-        #
-        # To debug your implementation, you might find it useful to ask
-        # Gurobi to output the current model it thinks you are asking it
-        # to optimize.
-        raise NotImplementedError
+    #### PLayer 1 LP ####
+    m1 = gurobi.Model("Optimal deterministic strategy for player 1")
 
-        m.optimize()
+    # define variables
+    x = m1.addMVar(shape=len(LP_sequence_set(tfsdp1)), vtype=GRB.BINARY, name='x')
+    print(f"{x.shape=}")
+    v1 = m1.addMVar(shape=len(infosets_pl1)+1, lb=-10, ub=1, name='v1')
+    print(f"{v1.shape=}")
+
+    # set objective
+    m1.setObjective(f2@v1,GRB.MAXIMIZE)
+
+    # add constraints
+    m1.addConstr(A@x - F2.T@v1 >= 0)
+    m1.addConstr(F1@x == f1)
+
+    # optimize and output
+    m1.optimize()
+
+    #### PLayer 2 LP ####
+    m2 = gurobi.Model("Optimal deterministic strategy for player 2")
+
+    # define variables
+    y = m2.addMVar(shape=len(LP_sequence_set(tfsdp2)), vtype=GRB.BINARY, name='y')
+    print(f"{y.shape=}")
+    v2 = m2.addMVar(shape=len(infosets_pl2)+1, lb=-10, ub=1, name='v2')
+    print(f"{v2.shape=}")
+
+    # set objective
+    m2.setObjective(f1@v2,GRB.MAXIMIZE)
+
+    # add constraints
+    m2.addConstr(-A.T@y - F1.T@v2 >= 0)
+    m2.addConstr(F2@y == f2)
+
+    # optimize and output
+    m2.optimize()
+
+    print(f"The sum of both objective values should be 0.\nResult: {m1.objVal + m2.objVal}")
+    print(f"Player 1 nash value {m1.objVal}")
+    print(f"Player 2 nash value {m2.objVal}")
 
 def solve_problem_2_3(game):
-    for player in [1, 2]:
-        # FINISH
-        #
-        # To debug your implementation, you might find it useful to ask
-        # Gurobi to output the current model it thinks you are asking it
-        # to optimize.
-        raise NotImplementedError
+    tfsdp1, tfsdp2 = game['decision_problem_pl1'], game['decision_problem_pl2']
+    A = build_payoff_matrix(game)
+    F1_dict, f1_dict = LP_realization_matrices(tfsdp1)
+    F2_dict, f2_dict = LP_realization_matrices(tfsdp2)
+    F1, f1 = to_ndarrays(tfsdp1,F1_dict,f1_dict)
+    F2, f2 = to_ndarrays(tfsdp2,F2_dict,f2_dict)
+    infosets_pl1 = [node for node in tfsdp1 if node['type'] == 'decision']
+    infosets_pl2 = [node for node in tfsdp2 if node['type'] == 'decision']
+    sequence_list_pl1 = [None] + [(n['id'],a) for n in infosets_pl1 for a in n['actions']]
+    sequence_list_pl2 = [None] + [(n['id'],a) for n in infosets_pl2 for a in n['actions']]
+    sequence_map_pl1 = dict(zip(sequence_list_pl1,range(len(sequence_list_pl1))))
+    sequence_map_pl2 = dict(zip(sequence_list_pl2,range(len(sequence_list_pl2))))
+    print(f"{A.shape=}")
+    print(f"{F1.shape=}")
+    print(f"{f1.shape=}")
+    print(f"{F2.shape=}")
+    print(f"{f2.shape=}")
+
+    print(f"{len(infosets_pl1)=}")
+    print(sequence_map_pl1)
+    k = 2
+    #### PLayer 1 LP ####
+    m1 = gurobi.Model("Controlling amount of determinism for player 1")
+
+    # define variables
+    x = m1.addMVar(shape=len(LP_sequence_set(tfsdp1)), lb=0.0, ub=1.0, name='x')
+    print(f"{x.shape=}")
+    z1 = m1.addMVar(shape=len(LP_sequence_set(tfsdp1)), vtype=GRB.BINARY, name='z')
+    print(f"{z1.shape=}")
+    v1 = m1.addMVar(shape=len(infosets_pl1)+1, lb=-10, ub=10, name='v1')
+    print(f"{v1.shape=}")
+
+    # set objective
+    m1.setObjective(f2@v1,GRB.MAXIMIZE)
+
+    # add constraints
+    m1.addConstr(A@x - F2.T@v1 >= 0)
+    m1.addConstr(F1@x == f1)
+    """
+    for node in infosets_pl1:
+        for action in node['actions']:
+            index = sequence_map_pl1[(node['id'],action)]
+            match node['parent_sequence']:
+                case None: m1.addConstr(x[index] >= z1[index])
+                case parent_seq: m1.addConstr(x[index] >= x[sequence_map_pl1[parent_seq]] + z1[index] - 1)
+        m1.addConstr(sum(z1[sequence_map_pl1[(node['id'],action)]] for action in node['actions']) <= 1)
+    m1.addConstr(z1.sum() >= k)     
+    """
+
+    # optimize and output
+    m1.optimize()
+    print(x.X)
+    print(z1.X)
+
+    """
+    #### PLayer 2 LP ####
+    m2 = gurobi.Model("Controlling amount of determinism for player 2")
+
+    # define variables
+    y = m2.addMVar(shape=len(LP_sequence_set(tfsdp2)), lb=0.0, ub=1.0, name='y')
+    print(f"{y.shape=}")
+    v2 = m2.addMVar(shape=len(infosets_pl2)+1, lb=-10, ub=10, name='v2')
+    print(f"{v2.shape=}")
+
+    # set objective
+    m2.setObjective(f1@v2,GRB.MAXIMIZE)
+
+    # add constraints
+    m2.addConstr(-A.T@y - F1.T@v2 >= 0)
+    m2.addConstr(F2@y == f2)
+
+    # optimize and output
+    m2.optimize()
+
+    print(f"The sum of both objective values should be 0.\nResult: {m1.objVal + m2.objVal}")
+    """
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
