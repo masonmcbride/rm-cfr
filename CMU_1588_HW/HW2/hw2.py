@@ -185,6 +185,8 @@ def solve_problem_2_2(game):
     m2.optimize()
 
     print(f"The sum of both objective values should be 0.\nResult: {m1.objVal + m2.objVal}")
+    print(x.X)
+    print(y.X)
     print(f"Player 1 nash value {m1.objVal}")
     print(f"Player 2 nash value {m2.objVal}")
 
@@ -208,7 +210,6 @@ def solve_problem_2_3(game):
     print(f"{f2.shape=}")
 
     print(f"{len(infosets_pl1)=}")
-    print(sequence_map_pl1)
     k = 2
     #### PLayer 1 LP ####
     m1 = gurobi.Model("Controlling amount of determinism for player 1")
@@ -227,16 +228,17 @@ def solve_problem_2_3(game):
     # add constraints
     m1.addConstr(A@x - F2.T@v1 >= 0)
     m1.addConstr(F1@x == f1)
-    """
-    for node in infosets_pl1:
-        for action in node['actions']:
-            index = sequence_map_pl1[(node['id'],action)]
-            match node['parent_sequence']:
-                case None: m1.addConstr(x[index] >= z1[index])
-                case parent_seq: m1.addConstr(x[index] >= x[sequence_map_pl1[parent_seq]] + z1[index] - 1)
-        m1.addConstr(sum(z1[sequence_map_pl1[(node['id'],action)]] for action in node['actions']) <= 1)
-    m1.addConstr(z1.sum() >= k)     
-    """
+    for row in F1:
+        data = {int(val): [i for i,v in enumerate(row) if v == val] for val in set(row)}
+        print(data)
+        for ja in data[1]:
+            match data.get(-1, None):
+                case [0]: m1.addConstr(x[ja] >= z1[ja])
+                case [pj]: m1.addConstr(x[ja] >= x[pj] + z1[ja] - 1)
+                case None: m1.addConstr(x[ja] >= z1[ja])
+        m1.addConstr(sum(z1[ja] for ja in data[1]) <= 1)
+    m1.addConstr(z1.sum() >= k)
+    m1.printStats()
 
     # optimize and output
     m1.optimize()
