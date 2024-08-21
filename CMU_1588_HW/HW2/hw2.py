@@ -10,8 +10,10 @@ from gurobipy import GRB
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../')))
 from rm_cfr import *
 import numpy as np
+import matplotlib.pyplot as plt
+from matplotlib.ticker import MaxNLocator
 
-from pprint import pprint
+
 
 def build_payoff_matrix(game):
     """contruct the payoff matrix from the json provided in the game variable
@@ -184,7 +186,7 @@ def solve_problem_2_2(game):
     # optimize and output
     m2.optimize()
 
-    print(f"The sum of both objective values should be 0.\nResult: {m1.objVal + m2.objVal}")
+    print(f"The sum of both objective values does not have to be 0.\nResult: {m1.objVal + m2.objVal}")
     print(x.X)
     print(y.X)
     print(f"Player 1 nash value {m1.objVal}")
@@ -199,10 +201,6 @@ def solve_problem_2_3(game):
     F2, f2 = to_ndarrays(tfsdp2,F2_dict,f2_dict)
     infosets_pl1 = [node for node in tfsdp1 if node['type'] == 'decision']
     infosets_pl2 = [node for node in tfsdp2 if node['type'] == 'decision']
-    sequence_list_pl1 = [None] + [(n['id'],a) for n in infosets_pl1 for a in n['actions']]
-    sequence_list_pl2 = [None] + [(n['id'],a) for n in infosets_pl2 for a in n['actions']]
-    sequence_map_pl1 = dict(zip(sequence_list_pl1,range(len(sequence_list_pl1))))
-    sequence_map_pl2 = dict(zip(sequence_list_pl2,range(len(sequence_list_pl2))))
     print(f"{A.shape=}")
     print(f"{F1.shape=}")
     print(f"{f1.shape=}")
@@ -210,63 +208,86 @@ def solve_problem_2_3(game):
     print(f"{f2.shape=}")
 
     print(f"{len(infosets_pl1)=}")
-    k = 2
-    #### PLayer 1 LP ####
-    m1 = gurobi.Model("Controlling amount of determinism for player 1")
+    p1_values = []
+    p2_values = []
+    for k in range(len(infosets_pl1)+2):
+        if k % 10 == 0:
+            print(f"doing {k=}")
+        #### PLayer 1 LP ####
+        m1 = gurobi.Model("Controlling amount of determinism for player 1")
+        m1.setParam("OutputFlag", 0)
 
-    # define variables
-    x = m1.addMVar(shape=len(LP_sequence_set(tfsdp1)), lb=0.0, ub=1.0, name='x')
-    print(f"{x.shape=}")
-    z1 = m1.addMVar(shape=len(LP_sequence_set(tfsdp1)), vtype=GRB.BINARY, name='z')
-    print(f"{z1.shape=}")
-    v1 = m1.addMVar(shape=len(infosets_pl1)+1, lb=-10, ub=10, name='v1')
-    print(f"{v1.shape=}")
+        # define variables
+        x = m1.addMVar(shape=len(LP_sequence_set(tfsdp1)), lb=0.0, ub=10.0, name='x')
+        z1 = m1.addMVar(shape=len(LP_sequence_set(tfsdp1)), vtype=GRB.BINARY, name='z1')
+        v1 = m1.addMVar(shape=len(infosets_pl1)+1, lb=-10, ub=10, name='v1')
 
-    # set objective
-    m1.setObjective(f2@v1,GRB.MAXIMIZE)
+        # set objective
+        m1.setObjective(f2@v1,GRB.MAXIMIZE)
 
-    # add constraints
-    m1.addConstr(A@x - F2.T@v1 >= 0)
-    m1.addConstr(F1@x == f1)
-    for row in F1:
-        data = {int(val): [i for i,v in enumerate(row) if v == val] for val in set(row)}
-        print(data)
-        for ja in data[1]:
-            match data.get(-1, None):
-                case [0]: m1.addConstr(x[ja] >= z1[ja])
-                case [pj]: m1.addConstr(x[ja] >= x[pj] + z1[ja] - 1)
-                case None: m1.addConstr(x[ja] >= z1[ja])
-        m1.addConstr(sum(z1[ja] for ja in data[1]) <= 1)
-    m1.addConstr(z1.sum() >= k)
-    m1.printStats()
+        # add constraints
+        m1.addConstr(A@x - F2.T@v1 >= 0)
+        m1.addConstr(F1@x == f1)
+        for row in F1:
+            data = {int(val): [i for i,v in enumerate(row) if v == val] for val in set(row)}
+            for ja in data[1]:
+                match data.get(-1, None):
+                    case [0] | None: m1.addConstr(x[ja] >= z1[ja])
+                    case [pj]: m1.addConstr(x[ja] >= x[pj] + z1[ja] - 1)
+            m1.addConstr(sum(z1[ja] for ja in data[1]) <= 1)
+        m1.addConstr(z1.sum() >= k)
 
-    # optimize and output
-    m1.optimize()
-    print(x.X)
-    print(z1.X)
+        # optimize and output
+        m1.optimize()
 
-    """
-    #### PLayer 2 LP ####
-    m2 = gurobi.Model("Controlling amount of determinism for player 2")
+        p1_values.append(m1.objVal)
 
-    # define variables
-    y = m2.addMVar(shape=len(LP_sequence_set(tfsdp2)), lb=0.0, ub=1.0, name='y')
-    print(f"{y.shape=}")
-    v2 = m2.addMVar(shape=len(infosets_pl2)+1, lb=-10, ub=10, name='v2')
-    print(f"{v2.shape=}")
+    print("player 2 now")
+    for k in range(len(infosets_pl2)+2):
+        if k % 10 == 0:
+            print(f"doing {k=}")
+        #### PLayer 2 LP ####
+        m2 = gurobi.Model("Controlling amount of determinism for player 2")
+        m2.setParam("OutputFlag", 0)
 
-    # set objective
-    m2.setObjective(f1@v2,GRB.MAXIMIZE)
+        # define variables
+        y = m2.addMVar(shape=len(LP_sequence_set(tfsdp2)), lb=0.0, ub=1.0, name='y')
+        z2 = m2.addMVar(shape=len(LP_sequence_set(tfsdp2)), vtype=GRB.BINARY, name='z2')
+        v2 = m2.addMVar(shape=len(infosets_pl2)+1, lb=-10, ub=10, name='v2')
 
-    # add constraints
-    m2.addConstr(-A.T@y - F1.T@v2 >= 0)
-    m2.addConstr(F2@y == f2)
+        # set objective
+        m2.setObjective(f1@v2,GRB.MAXIMIZE)
 
-    # optimize and output
-    m2.optimize()
+        # add constraints
+        m2.addConstr(-A.T@y - F1.T@v2 >= 0)
+        m2.addConstr(F2@y == f2)
+        for row in F2:
+            data = {int(val): [i for i,v in enumerate(row) if v == val] for val in set(row)}
+            for ja in data[1]:
+                match data.get(-1, None):
+                    case [0] | None: m2.addConstr(y[ja] >= z2[ja])
+                    case [pj]: m2.addConstr(y[ja] >= y[pj] + z2[ja] - 1)
+            m2.addConstr(sum(z2[ja] for ja in data[1]) <= 1)
+        m2.addConstr(z2.sum() >= k)
 
-    print(f"The sum of both objective values should be 0.\nResult: {m1.objVal + m2.objVal}")
-    """
+        # optimize and output
+        m2.optimize()
+
+        p2_values.append(m2.objVal)
+
+    print(p1_values)
+    print(p2_values)
+    fig = plt.figure()
+    fig.suptitle(f'Value for each player with controlled determinism for {args.game[:-5].upper()}', fontsize=10)
+    plt.scatter(range(len(infosets_pl1)+2), p1_values, color='r',label='player 1 value',alpha=0.5)
+    plt.scatter(range(len(infosets_pl2)+2), p2_values, color='b',label='player 2 value',alpha=0.5)
+    plt.xlabel('k (minimum amount of deterministic strategies)', fontsize=10)
+    plt.gca().xaxis.set_major_locator(MaxNLocator(integer=True))
+    plt.ylabel('Optimal Game Value Achievable', fontsize=10)
+    plt.legend()
+
+    plt.savefig(f'gurobi_output/prob2.3_{args.game[:-5]}.png')
+    plt.show()
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(

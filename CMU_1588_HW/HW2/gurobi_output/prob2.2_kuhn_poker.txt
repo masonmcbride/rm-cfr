@@ -1,0 +1,92 @@
+ python hw2.py --game kuhn_poker.json --pro
+blem 2.2
+Reading game path kuhn_poker.json...
+... done. Running code for Problem 2.2
+A.shape=(13, 13)
+F1.shape=(7, 13)
+f1.shape=(1, 7)
+F2.shape=(7, 13)
+f2.shape=(1, 7)
+Restricted license - for non-production use only - expires 2025-11-24
+x.shape=(13,)
+v1.shape=(7,)
+Gurobi Optimizer version 11.0.3 build v11.0.3rc0 (linux64 - "Ubuntu 22.04.4 LTS")
+
+CPU model: 12th Gen Intel(R) Core(TM) i7-12700K, instruction set [SSE2|AVX|AVX2]
+Thread count: 10 physical cores, 20 logical processors, using up to 20 threads
+
+Optimize a model with 20 rows, 20 columns and 68 nonzeros
+Model fingerprint: 0xa5b21da6
+Variable types: 7 continuous, 13 integer (13 binary)
+Coefficient statistics:
+  Matrix range     [2e-01, 1e+00]
+  Objective range  [1e+00, 1e+00]
+  Bounds range     [1e+00, 1e+01]
+  RHS range        [1e+00, 1e+00]
+Found heuristic solution: objective -10.0000000
+Presolve removed 13 rows and 12 columns
+Presolve time: 0.00s
+Presolved: 7 rows, 8 columns, 22 nonzeros
+Found heuristic solution: objective -0.5000000
+Variable types: 0 continuous, 8 integer (5 binary)
+
+Root relaxation: objective -5.555556e-02, 9 iterations, 0.00 seconds (0.00 work units)
+
+    Nodes    |    Current Node    |     Objective Bounds      |     Work
+ Expl Unexpl |  Obj  Depth IntInf | Incumbent    BestBd   Gap | It/Node Time
+
+     0     0   -0.05556    0    3   -0.50000   -0.05556  88.9%     -    0s
+H    0     0                      -0.1666667   -0.05556  66.7%     -    0s
+     0     0   -0.05556    0    3   -0.16667   -0.05556  66.7%     -    0s
+
+Explored 1 nodes (9 simplex iterations) in 0.01 seconds (0.00 work units)
+Thread count was 20 (of 20 available processors)
+
+Solution count 3: -0.166667 -0.5 -10
+No other solutions better than -0.166667
+
+Optimal solution found (tolerance 1.00e-04)
+Best objective -1.666666666667e-01, best bound -1.666666666667e-01, gap 0.0000%
+y.shape=(13,)
+v2.shape=(7,)
+Gurobi Optimizer version 11.0.3 build v11.0.3rc0 (linux64 - "Ubuntu 22.04.4 LTS")
+
+CPU model: 12th Gen Intel(R) Core(TM) i7-12700K, instruction set [SSE2|AVX|AVX2]
+Thread count: 10 physical cores, 20 logical processors, using up to 20 threads
+
+Optimize a model with 20 rows, 20 columns and 68 nonzeros
+Model fingerprint: 0x43c035cc
+Variable types: 7 continuous, 13 integer (13 binary)
+Coefficient statistics:
+  Matrix range     [2e-01, 1e+00]
+  Objective range  [1e+00, 1e+00]
+  Bounds range     [1e+00, 1e+01]
+  RHS range        [1e+00, 1e+00]
+Found heuristic solution: objective -10.0000000
+Presolve removed 17 rows and 16 columns
+Presolve time: 0.00s
+Presolved: 3 rows, 4 columns, 9 nonzeros
+Found heuristic solution: objective -0.1666667
+Variable types: 0 continuous, 4 integer (2 binary)
+
+Root relaxation: objective -8.333333e-02, 3 iterations, 0.00 seconds (0.00 work units)
+
+    Nodes    |    Current Node    |     Objective Bounds      |     Work
+ Expl Unexpl |  Obj  Depth IntInf | Incumbent    BestBd   Gap | It/Node Time
+
+     0     0 infeasible    0        -0.16667   -0.16667  0.00%     -    0s
+
+Explored 1 nodes (3 simplex iterations) in 0.00 seconds (0.00 work units)
+Thread count was 20 (of 20 available processors)
+
+Solution count 2: -0.166667 -10
+No other solutions better than -0.166667
+
+Optimal solution found (tolerance 1.00e-04)
+Best objective -1.666666666667e-01, best bound -1.666666666667e-01, gap 0.0000%
+The sum of both objective values does not have to be 0.
+Result: -0.3333333333333333
+[1. 1. 0. 0. 1. 1. 0. 0. 1. 1. 0. 1. 0.]
+[1. 1. 0. 0. 1. 1. 0. 1. 0. 1. 0. 1. 0.]
+Player 1 nash value -0.16666666666666666
+Player 2 nash value -0.16666666666666666

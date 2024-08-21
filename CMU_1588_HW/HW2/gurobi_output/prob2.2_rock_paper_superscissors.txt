@@ -1,0 +1,71 @@
+python hw2.py --game rock_paper_superscissors.json --problem 2.2
+Reading game path rock_paper_superscissors.json...
+... done. Running code for Problem 2.2
+A.shape=(4, 4)
+F1.shape=(2, 4)
+f1.shape=(1, 2)
+F2.shape=(2, 4)
+f2.shape=(1, 2)
+Restricted license - for non-production use only - expires 2025-11-24
+x.shape=(4,)
+v1.shape=(2,)
+Gurobi Optimizer version 11.0.3 build v11.0.3rc0 (linux64 - "Ubuntu 22.04.4 LTS")
+
+CPU model: 12th Gen Intel(R) Core(TM) i7-12700K, instruction set [SSE2|AVX|AVX2]
+Thread count: 10 physical cores, 20 logical processors, using up to 20 threads
+
+Optimize a model with 6 rows, 6 columns and 16 nonzeros
+Model fingerprint: 0x701ea198
+Variable types: 2 continuous, 4 integer (4 binary)
+Coefficient statistics:
+  Matrix range     [1e+00, 2e+00]
+  Objective range  [1e+00, 1e+00]
+  Bounds range     [1e+00, 1e+01]
+  RHS range        [1e+00, 1e+00]
+Found heuristic solution: objective -10.0000000
+Presolve removed 6 rows and 6 columns
+Presolve time: 0.00s
+Presolve: All rows and columns removed
+
+Explored 0 nodes (0 simplex iterations) in 0.00 seconds (0.00 work units)
+Thread count was 1 (of 20 available processors)
+
+Solution count 2: -1 -10
+No other solutions better than -1
+
+Optimal solution found (tolerance 1.00e-04)
+Best objective -1.000000000000e+00, best bound -1.000000000000e+00, gap 0.0000%
+y.shape=(4,)
+v2.shape=(2,)
+Gurobi Optimizer version 11.0.3 build v11.0.3rc0 (linux64 - "Ubuntu 22.04.4 LTS")
+
+CPU model: 12th Gen Intel(R) Core(TM) i7-12700K, instruction set [SSE2|AVX|AVX2]
+Thread count: 10 physical cores, 20 logical processors, using up to 20 threads
+
+Optimize a model with 6 rows, 6 columns and 16 nonzeros
+Model fingerprint: 0x701ea198
+Variable types: 2 continuous, 4 integer (4 binary)
+Coefficient statistics:
+  Matrix range     [1e+00, 2e+00]
+  Objective range  [1e+00, 1e+00]
+  Bounds range     [1e+00, 1e+01]
+  RHS range        [1e+00, 1e+00]
+Found heuristic solution: objective -10.0000000
+Presolve removed 6 rows and 6 columns
+Presolve time: 0.00s
+Presolve: All rows and columns removed
+
+Explored 0 nodes (0 simplex iterations) in 0.00 seconds (0.00 work units)
+Thread count was 1 (of 20 available processors)
+
+Solution count 2: -1 -10
+No other solutions better than -1
+
+Optimal solution found (tolerance 1.00e-04)
+Best objective -1.000000000000e+00, best bound -1.000000000000e+00, gap 0.0000%
+The sum of both objective values does not have to be 0.
+Result: -2.0
+[1. 1. 0. 0.]
+[1. 1. 0. 0.]
+Player 1 nash value -1.0
+Player 2 nash value -1.0
